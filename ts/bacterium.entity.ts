@@ -9,12 +9,8 @@
 import { GameEntity } from "game-entity"
 
 export class BacteriumEntity extends GameEntity {
-  private constructor() { super() }
-  draw(g: CanvasRenderingContext2D): void { }
-  static create(/* @todo require systems */): BacteriumEntity {
-    const result = new BacteriumEntity()
-    // @todo
-    //   add components
-    return result
+  constructor() {
+    super()
   }
+  draw(g: CanvasRenderingContext2D): void { }
 }

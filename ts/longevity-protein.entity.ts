@@ -9,12 +9,8 @@
 import { GameEntity } from "game-entity"
 
 export class LongevityProteinEntity extends GameEntity {
-  private constructor() { super() }
-  static create(/* @todo require systems */): LongevityProteinEntity {
-    const result = new LongevityProteinEntity()
-    // @todo
-    //   add components
-    return result
+  constructor() {
+    super()
   }
   draw(g: CanvasRenderingContext2D): void { }
 }
