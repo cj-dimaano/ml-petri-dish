@@ -7,11 +7,11 @@
 *******************************************************************************/
 
 import * as MathEx from "math-ex"
-import { GameSystem } from "game-system"
+import { GameComponentSystem } from "game-system"
 import { GameEntity } from "game-entity"
 import { GameComponentKinds, ParticleComponent } from "components"
 
-export class ParticleSystem extends GameSystem {
+export class ParticleSystem extends GameComponentSystem {
   constructor(
     public readonly screenHeight: number,
     public readonly screenWidth: number

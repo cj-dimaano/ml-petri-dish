@@ -20,6 +20,22 @@ import { GameEntity } from "game-entity"
 export abstract class GameSystem {
   /**
    * @summary
+   *   Updates the components of the system.
+   *
+   * @param dt
+   *   The change in time since the previous update measured in miliseconds.
+   */
+  abstract update(dt: number): void
+}
+
+/**
+ * @summary
+ *   Extends the `GameSystem` for systems dealing with particular kinds of
+ *   components.
+ */
+export abstract class GameComponentSystem extends GameSystem {
+  /**
+   * @summary
    *   Constructs a game system.
    *
    * @param kind
@@ -27,22 +43,13 @@ export abstract class GameSystem {
    */
   protected constructor(
     public readonly kind: GameComponentKinds
-  ) { }
+  ) { super() }
 
   /**
    * @summary
    *   The set of components belonging to this particular system.
    */
   protected components: GameComponent[] = []
-
-  /**
-   * @summary
-   *   Updates the components of the system.
-   *
-   * @param dt
-   *   The change in time since the previous update measured in miliseconds.
-   */
-  abstract update(dt: number): void
 
   /**
    * @summary
@@ -77,7 +84,6 @@ export abstract class GameSystem {
    */
   detachComponent(host: GameEntity): void {
     this.components = this.components
-      .filter(value =>
-        value.kind !== this.kind || value.host !== host)
+      .filter(value => value.kind !== this.kind || value.host !== host)
   }
 }

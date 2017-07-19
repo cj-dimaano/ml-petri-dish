@@ -11,7 +11,7 @@
 *******************************************************************************/
 
 import * as MathEx from "math-ex"
-import { GameSystem } from "game-system"
+import { GameComponentSystem } from "game-system"
 import { GameEntity } from "game-entity"
 import {
   GameComponentKinds,
@@ -19,7 +19,7 @@ import {
   ParticleComponent
 } from "components"
 
-export class EnergySystem extends GameSystem {
+export class EnergySystem extends GameComponentSystem {
   constructor() { super(GameComponentKinds.Energy) }
 
   update(dt: number): void {
