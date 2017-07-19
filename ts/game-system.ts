@@ -16,8 +16,12 @@ import { GameEntity } from "game-entity"
  * @summary
  *   Represents a discrete game mechanic and provides common functionality
  *   shared among all game systems.
+ * 
+ * @description
+ *   Game systems are intended to be singleton objects.
  */
 export abstract class GameSystem {
+  protected constructor() { }
   /**
    * @summary
    *   Updates the components of the system.
