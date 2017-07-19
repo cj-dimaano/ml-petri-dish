@@ -29,17 +29,34 @@ export class EnergySystem extends GameSystem {
     // Update each component.
     this.components.forEach(
       (value) => {
-        // Apply acceleration to the velocity.
-        const energyComponent = <EnergyComponent>value
-        if (energyComponent.applyAcceleration) {
-          console.assert(value.host.components.has(GameComponentKinds.Particle),
-            "error: energy component host entity missing particle component")
-          const particleComponent = <ParticleComponent>value.host.components
-            .get(GameComponentKinds.Energy)!
-          const u = MathEx.normalize(particleComponent.velocity)
-          MathEx._scale(u, sec * energyComponent.acceleration)
-          MathEx._translate(particleComponent.velocity, u)
-        }
+        // Assert the type of the current value as an `EnergyComponent`.
+        const energy = <EnergyComponent>value
+
+        // Get the particle component from the host entity.
+        console.assert(value.host.components.has(GameComponentKinds.Particle),
+          "error: energy component host entity missing particle component")
+        const particle = <ParticleComponent>value.host.components
+          .get(GameComponentKinds.Particle)!
+
+        // Get the normalized velocity vector of the particle.
+        const u = MathEx.normalize(particle.velocity)
+
+        // Calculate acceleration.
+        const accel = sec * energy.acceleration
+
+        // Apply linear acceleration.
+        if (energy.applyAcceleration)
+          MathEx._scale(u, accel)
+
+        // Apply angular acceleration.
+        // > In reality, angular acceleration would cause the particle to rotate
+        // > in the opposite direction. Here, we don't really care which
+        // > direction rotation occurs.
+        if (energy.applyAngularAcceleration)
+          MathEx._rotate(u, accel)
+
+        // Apply acceleration to velocity.
+        MathEx._translate(particle.velocity, u)
       }
     )
   }
