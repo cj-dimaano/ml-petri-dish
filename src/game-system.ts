@@ -9,8 +9,8 @@
 import {
   GameComponent,
   GameComponentKinds
-} from "components"
-import { GameEntity } from "game-entity"
+} from "./components"
+import { GameEntity } from "./game-entity"
 
 /**
  * @summary

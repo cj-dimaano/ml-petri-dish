@@ -6,8 +6,8 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { vec2 } from "math-ex"
-import { GameEntity } from "game-entity"
+import { vec2 } from "./math-ex"
+import { GameEntity } from "./game-entity"
 
 /**
  * @summary

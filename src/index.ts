@@ -6,8 +6,8 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { BubbleEntity } from "bubble.entity"
-import { ParticleSystem } from "particle.system"
+import { BubbleEntity } from "./bubble.entity"
+import { ParticleSystem } from "./particle.system"
 
 let canvas: HTMLCanvasElement
 let g: CanvasRenderingContext2D

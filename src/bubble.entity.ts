@@ -6,9 +6,9 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { GameEntity } from "game-entity"
-import { ParticleSystem } from "particle.system"
-import { GameComponentKinds, ParticleComponent } from "components"
+import { GameEntity } from "./game-entity"
+import { ParticleSystem } from "./particle.system"
+import { GameComponentKinds, ParticleComponent } from "./components"
 
 export class BubbleEntity extends GameEntity {
   constructor(particleSystem: ParticleSystem) {

@@ -6,10 +6,10 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { GameSystem } from "game-system"
-import { BubbleEntity } from "bubble.entity"
-import { LongevityProteinEntity } from "longevity-protein.entity"
-import { BacteriumEntity } from "bacterium.entity"
+import { GameSystem } from "./game-system"
+import { BubbleEntity } from "./bubble.entity"
+import { LongevityProteinEntity } from "./longevity-protein.entity"
+import { BacteriumEntity } from "./bacterium.entity"
 
 /**
  * @summary

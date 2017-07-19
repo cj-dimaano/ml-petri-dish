@@ -6,10 +6,10 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import * as MathEx from "math-ex"
-import { GameComponentSystem } from "game-system"
-import { GameEntity } from "game-entity"
-import { GameComponentKinds, ParticleComponent } from "components"
+import * as MathEx from "./math-ex"
+import { GameComponentSystem } from "./game-system"
+import { GameEntity } from "./game-entity"
+import { GameComponentKinds, ParticleComponent } from "./components"
 
 export class ParticleSystem extends GameComponentSystem {
   constructor(

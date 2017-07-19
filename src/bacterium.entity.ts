@@ -6,7 +6,7 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { GameEntity } from "game-entity"
+import { GameEntity } from "./game-entity"
 
 export class BacteriumEntity extends GameEntity {
   constructor() {

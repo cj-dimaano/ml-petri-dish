@@ -6,7 +6,7 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { GameComponentKinds, GameComponent } from "components"
+import { GameComponentKinds, GameComponent } from "./components"
 
 /**
  * @summary

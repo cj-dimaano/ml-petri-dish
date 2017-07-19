@@ -10,14 +10,14 @@
   > angular acceleration affects linear velocity
 *******************************************************************************/
 
-import * as MathEx from "math-ex"
-import { GameComponentSystem } from "game-system"
-import { GameEntity } from "game-entity"
+import * as MathEx from "./math-ex"
+import { GameComponentSystem } from "./game-system"
+import { GameEntity } from "./game-entity"
 import {
   GameComponentKinds,
   EnergyComponent,
   ParticleComponent
-} from "components"
+} from "./components"
 
 export class EnergySystem extends GameComponentSystem {
   constructor() { super(GameComponentKinds.Energy) }
