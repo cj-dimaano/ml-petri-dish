@@ -27,9 +27,9 @@ export class ParticleSystem extends GameSystem {
     // Update each component.
     this.components.forEach(
       (value) => {
-        const particleComponent = <ParticleComponent>value;
-        const velocity = MathEx.scale(particleComponent.velocity, sec)
-        MathEx._translate(particleComponent.position, velocity)
+        const particle = <ParticleComponent>value;
+        const velocity = MathEx.scale(particle.velocity, sec)
+        MathEx._translate(particle.position, velocity)
       }
     )
   }
