@@ -92,7 +92,12 @@ export class DecayComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.Decay, host)
   }
-  remaining: number = 10000
+  private lifespan: number = 0
+  durability: number = 1000
+  calculateProbability(dt: number): number {
+    this.lifespan += dt
+    return this.lifespan / (this.durability + this.lifespan)
+  }
 }
 
 export class EnergyComponent extends GameComponent {
