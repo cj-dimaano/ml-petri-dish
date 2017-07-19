@@ -9,10 +9,7 @@
 import * as MathEx from "math-ex"
 import { GameSystem } from "game-system"
 import { GameEntity } from "game-entity"
-import {
-  GameComponentKinds,
-  ParticleComponent
-} from "components"
+import { GameComponentKinds, ParticleComponent } from "components"
 
 export class ParticleSystem extends GameSystem {
   constructor(
@@ -30,6 +27,7 @@ export class ParticleSystem extends GameSystem {
         const particle = <ParticleComponent>value;
         const velocity = MathEx.scale(particle.velocity, sec)
         MathEx._translate(particle.position, velocity)
+        particle.angle += particle.angularVelocity
       }
     )
   }
