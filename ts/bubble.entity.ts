@@ -7,14 +7,23 @@
 *******************************************************************************/
 
 import { GameEntity } from "game-entity"
+import { ParticleSystem } from "particle.system"
+import { GameComponentKinds, ParticleComponent } from "components"
 
 export class BubbleEntity extends GameEntity {
-  private constructor() { super() }
-  static create(/* @todo require systems */): BubbleEntity {
-    const result = new BubbleEntity()
-    // @todo
-    //   add components
-    return result
+  constructor(particleSystem: ParticleSystem) {
+    super()
+    particleSystem.attachComponent(this)
   }
-  draw(g: CanvasRenderingContext2D): void { }
+  draw(g: CanvasRenderingContext2D): void {
+    console.assert(this.components.has(GameComponentKinds.Particle),
+      "error: missing particle component in bubble enttiy")
+    const particle = <ParticleComponent>this.components
+      .get(GameComponentKinds.Particle)!
+    g.strokeStyle = "blue"
+    g.lineWidth = 1
+    g.beginPath()
+    g.arc(particle.position[0], particle.position[1], 2, 0, 2 * Math.PI)
+    g.stroke()
+  }
 }
