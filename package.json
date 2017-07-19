@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Machine learning example of a simple petri dish simulation.",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "webpack": "webpack --colors --display-error-details"
+  },
   "author": "CJ Dimaano",
   "license": "ISC",
   "dependencies": {},
