@@ -8,7 +8,7 @@
 
 module.exports = {
   entry: {
-    index: "./ts/index"
+    index: "./src/index"
   },
   output: {
     filename: "index.js"
