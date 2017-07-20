@@ -38,25 +38,34 @@ export class EnergySystem extends GameComponentSystem {
         const particle = <ParticleComponent>value.host.components
           .get(GameComponentKinds.Particle)!
 
-        // Get the normalized velocity vector of the particle.
-        const u = MathEx.normalize(particle.velocity)
+        // Get the unit vector of the facing direction.
+        const u = MathEx.rotate([1, 0], particle.angle)
 
         // Calculate acceleration.
         const accel = sec * energy.acceleration
 
         // Apply linear acceleration.
-        if (energy.applyAcceleration)
+        if (energy.applyAcceleration && energy.fuel > 0) {
           MathEx._scale(u, accel)
+          energy.fuel -= (sec < energy.fuel ? sec : energy.fuel)
+        }
 
         // Apply angular acceleration.
         // > In reality, angular acceleration would cause the particle to rotate
         // > in the opposite direction. Here, we don't really care which
         // > direction rotation occurs.
-        if (energy.applyAngularAcceleration)
+        if (energy.applyAngularAcceleration && energy.fuel > 0) {
           MathEx._rotate(u, accel)
+          energy.fuel -= (sec < energy.fuel ? sec : energy.fuel)
+        }
 
         // Apply acceleration to velocity.
         MathEx._translate(particle.velocity, u)
+
+        // Limit maximum velocity.
+        const mag = MathEx.dot(particle.velocity, particle.velocity)
+        if (mag > 900)
+          MathEx._scale(particle.velocity, 900 / mag)
       }
     )
   }
