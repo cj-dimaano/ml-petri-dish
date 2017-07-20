@@ -8,12 +8,17 @@
 
 import { GameEntity } from "./game-entity"
 import { ParticleSystem } from "./particle.system"
+import { DecaySystem } from "./decay.system"
 import { GameComponentKinds, ParticleComponent } from "./components"
 
 export class BubbleEntity extends GameEntity {
-  constructor(particleSystem: ParticleSystem) {
+  constructor(
+    particleSystem: ParticleSystem,
+    decaySystem: DecaySystem
+  ) {
     super()
     particleSystem.attachComponent(this)
+    decaySystem.attachComponent(this)
   }
   draw(g: CanvasRenderingContext2D): void {
     console.assert(this.components.has(GameComponentKinds.Particle),
