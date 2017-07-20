@@ -71,12 +71,14 @@ export abstract class GameComponentSystem extends GameSystem {
    * @param host
    *   The entity to be attached by the created component.
    */
-  attachComponent(host: GameEntity): void {
+  attachComponent(host: GameEntity): GameComponent {
     console.assert(this.components
       .find(value =>
         value.kind === this.kind && value.host === host) === undefined,
       `error: entity already has component ${this.kind}`)
     this.components.push(this.createComponent(host))
+    host.systems.add(this)
+    return this.components[this.components.length - 1]
   }
 
   /**
@@ -89,5 +91,6 @@ export abstract class GameComponentSystem extends GameSystem {
   detachComponent(host: GameEntity): void {
     this.components = this.components
       .filter(value => value.kind !== this.kind || value.host !== host)
+    host.systems.delete(this)
   }
 }
