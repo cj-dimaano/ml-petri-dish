@@ -144,6 +144,13 @@ export class SignalComponent extends GameComponent {
     super(GameComponentKinds.Signal, host)
   }
   radius: number = 0
+  /**
+   * value between [0..1]; currently hardcoded:
+   * bacteria = 1/4, oxygen = 1/2, protein = 3/4;
+   * maybe compute value based on crypto hash of type name;
+   * signature is used as one of the features for ML
+   */
+  signature: number = 0
 }
 
 export class SensorComponent extends GameComponent {
@@ -151,11 +158,4 @@ export class SensorComponent extends GameComponent {
     super(GameComponentKinds.Sensor, host)
   }
   detected: GameEntity[] = []
-}
-
-export class OverlapComponent extends GameComponent {
-  constructor(host: GameEntity) {
-    super(GameComponentKinds.Overlap, host);
-  }
-  radius: number = 1
 }
