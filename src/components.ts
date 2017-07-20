@@ -68,7 +68,8 @@ export class ParticleComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.Particle, host)
   }
-
+  radius: number = 1
+  padding: number = 1
   position: vec2 = [0, 0]
   velocity: vec2 = [0, 0]
   angle: number = 0

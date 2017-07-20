@@ -24,11 +24,11 @@ export class ParticleSystem extends GameComponentSystem {
       max: number,
       v: MathEx.vec2,
       i: number): number => {
-      if (x > max) {
+      if (v[i] > 0 && x > max) {
         v[i] *= -1
         return 2 * max - x
       }
-      if (0 > x) {
+      if (v[i] < 0 && min > x) {
         v[i] *= -1
         return min - x
       }
@@ -43,9 +43,20 @@ export class ParticleSystem extends GameComponentSystem {
         const particle = <ParticleComponent>value;
         const v = MathEx.scale(particle.velocity, sec)
         const p = particle.position
+        const pad = particle.padding
         MathEx._translate(p, v)
-        p[0] = fnReflect(p[0], 0, this.screenWidth, particle.velocity, 0)
-        p[1] = fnReflect(p[1], 0, this.screenHeight, particle.velocity, 1)
+        p[0] = fnReflect(
+          p[0],
+          pad,
+          this.screenWidth - pad,
+          particle.velocity,
+          0)
+        p[1] = fnReflect(
+          p[1],
+          pad,
+          this.screenHeight - pad,
+          particle.velocity,
+          1)
         particle.angle += particle.angularVelocity
       }
     )
