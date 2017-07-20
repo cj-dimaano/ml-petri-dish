@@ -6,6 +6,7 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
+import { GameComponentSystem } from "./game-system"
 import { GameComponentKinds, GameComponent } from "./components"
 
 /**
@@ -21,9 +22,29 @@ export abstract class GameEntity {
 
   /**
    * @summary
+   *   Determines whether or not the entity has been disposed.
+   */
+  private _isDisposed: boolean = false
+
+  /**
+   * @summary
    *   The set of components attached to this entity.
    */
   readonly components = new Map<GameComponentKinds, GameComponent>()
+
+  /**
+   * @summary
+   *   The set of game systems to which this entity belongs.
+   */
+  readonly systems = new Set<GameComponentSystem>()
+
+  /**
+   * @summary
+   *   Gets whether or not the entity has been disposed.
+   */
+  get isDisposed(): boolean {
+    return this._isDisposed
+  }
 
   /**
    * @summary
@@ -33,4 +54,13 @@ export abstract class GameEntity {
    *   The rendering context of the target canvas.
    */
   abstract draw(g: CanvasRenderingContext2D): void
+
+  /**
+   * @summary
+   *   Disposes the entity.
+   */
+  dispose(): void {
+    this._isDisposed = true
+    this.systems.forEach((value) => value.detachComponent(this))
+  }
 }
