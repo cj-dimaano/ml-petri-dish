@@ -26,7 +26,7 @@ export class ParticleSystem extends GameComponentSystem {
       i: number): number => {
       if (x > max) {
         v[i] *= -1
-        return x - max
+        return 2 * max - x
       }
       if (0 > x) {
         v[i] *= -1
