@@ -10,16 +10,25 @@ import { PIx2 } from "./math-ex"
 import { GameEntity } from "./game-entity"
 import { ParticleSystem } from "./particle.system"
 import { DecaySystem } from "./decay.system"
-import { GameComponentKinds, ParticleComponent } from "./components"
+import {
+  GameComponentKinds,
+  ParticleComponent,
+  SignalComponent
+} from "./components"
+import { SignalSystem } from "./signal.system";
 
 export class BubbleEntity extends GameEntity {
   constructor(
     particleSystem: ParticleSystem,
-    decaySystem: DecaySystem
+    decaySystem: DecaySystem,
+    signalSystem: SignalSystem
   ) {
     super()
     const particle = <ParticleComponent>particleSystem.attachComponent(this)
     decaySystem.attachComponent(this)
+    const signal = <SignalComponent>signalSystem.attachComponent(this)
+    signal.signature = 1 / 2
+    signal.radius = 6
     particle.radius = 2
     particle.padding = 1
   }
