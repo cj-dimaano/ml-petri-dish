@@ -71,8 +71,7 @@ export class EnergySystem extends GameComponentSystem {
   }
 
   protected createComponent(host: GameEntity): EnergyComponent {
-    const result = new EnergyComponent(host)
-    return result
+    return new EnergyComponent(host)
   }
 
 }

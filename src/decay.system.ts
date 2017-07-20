@@ -13,8 +13,7 @@ import { DecayComponent, GameComponentKinds } from "./components";
 export class DecaySystem extends GameComponentSystem {
   constructor() { super(GameComponentKinds.Decay) }
   protected createComponent(host: GameEntity): DecayComponent {
-    const result = new DecayComponent(host)
-    return result
+    return new DecayComponent(host)
   }
   update(dt: number): void {
     this.components.forEach(

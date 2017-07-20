@@ -14,8 +14,7 @@ export class GrowthSystem extends GameComponentSystem {
   constructor() { super(GameComponentKinds.Growth) }
   update(dt: number): void { }
   protected createComponent(host: GameEntity): GrowthComponent {
-    const result = new GrowthComponent(host)
-    return result
+    return new GrowthComponent(host)
   }
 
 }
