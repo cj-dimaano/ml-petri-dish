@@ -96,7 +96,7 @@ export class DecayComponent extends GameComponent {
   durability: number = 1000
   calculateProbability(dt: number): number {
     this.lifespan += dt
-    return this.lifespan / (this.durability + this.lifespan)
+    return this.lifespan / (this.durability + this.lifespan) / this.durability
   }
 }
 
