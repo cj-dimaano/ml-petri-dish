@@ -6,8 +6,9 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { BubbleEntity } from "./bubble.entity"
 import { ParticleSystem } from "./particle.system"
+import { DecaySystem } from "./decay.system"
+import { FiatSystem } from "./fiat.system"
 
 let canvas: HTMLCanvasElement
 let g: CanvasRenderingContext2D
@@ -16,16 +17,21 @@ let screenWidth: number
 let prevTimestamp: number
 
 let particleSystem: ParticleSystem
-let bubbles: BubbleEntity[] = []
+let decaySystem: DecaySystem
+let fiatSystem: FiatSystem
 
 function update(dt: number) {
+  decaySystem.update(dt)
+  particleSystem.update(dt)
+  fiatSystem.update(dt)
 }
 
 function draw() {
   g.fillStyle = "white"
   g.fillRect(0, 0, screenWidth, screenHeight)
-  for (const bubble of bubbles)
-    bubble.draw(g)
+  fiatSystem.bubbles.forEach((value) => value.draw(g))
+  fiatSystem.proteins.forEach((value) => value.draw(g))
+  fiatSystem.bacteria.forEach((value) => value.draw(g))
 }
 
 function updateAndDraw(timestamp: number) {
@@ -44,8 +50,8 @@ function init() {
   screenHeight = canvas.clientHeight
   screenWidth = canvas.clientWidth
   particleSystem = new ParticleSystem(screenHeight, screenWidth)
-  for (let i = 0; i < 50; i++)
-    bubbles.push(new BubbleEntity(particleSystem))
+  decaySystem = new DecaySystem()
+  fiatSystem = new FiatSystem(particleSystem, decaySystem)
   window.requestAnimationFrame(updateAndDraw)
 }
 
