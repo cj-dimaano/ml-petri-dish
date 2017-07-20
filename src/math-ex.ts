@@ -8,6 +8,8 @@
 
 export type vec2 = [number, number]
 
+export const PIx2 = Math.PI * 2
+
 export function dot(v: vec2, u: vec2): number {
   return v[0] * u[0] + v[1] * u[1]
 }
