@@ -18,15 +18,34 @@ export class ParticleSystem extends GameComponentSystem {
   ) { super(GameComponentKinds.Particle) }
 
   update(dt: number): void {
-    // Get the delta time in seconds.
+    const fnReflect = (
+      x: number,
+      min: number,
+      max: number,
+      v: MathEx.vec2,
+      i: number): number => {
+      if (x > max) {
+        v[i] *= -1
+        return x - max
+      }
+      if (0 > x) {
+        v[i] *= -1
+        return min - x
+      }
+      return x
+    }
+    // Delta time in seconds.
     const sec = dt / 1000
 
     // Update each component.
     this.components.forEach(
       (value) => {
         const particle = <ParticleComponent>value;
-        const velocity = MathEx.scale(particle.velocity, sec)
-        MathEx._translate(particle.position, velocity)
+        const v = MathEx.scale(particle.velocity, sec)
+        const p = particle.position
+        MathEx._translate(p, v)
+        p[0] = fnReflect(p[0], 0, this.screenWidth, particle.velocity, 0)
+        p[1] = fnReflect(p[1], 0, this.screenHeight, particle.velocity, 1)
         particle.angle += particle.angularVelocity
       }
     )
