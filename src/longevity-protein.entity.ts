@@ -21,12 +21,14 @@ export class LongevityProteinEntity extends GameEntity {
     particle.velocity[0] = 5 - 10 * Math.random()
     particle.velocity[1] = 5 - 10 * Math.random()
     particle.angularVelocity = 0.1 - 0.2 * Math.random()
+    particle.radius = 3
+    particle.padding = 1.5
   }
   draw(g: CanvasRenderingContext2D): void {
     const particle = <ParticleComponent>this.components
       .get(GameComponentKinds.Particle)!
-    const p = MathEx.rotate([0, -3], particle.angle)
-    const pi2_3 = 2 * Math.PI / 3
+    const p = MathEx.rotate([0, -particle.radius], particle.angle)
+    const pi2_3 = MathEx.PIx2 / 3
     g.fillStyle = "green"
     g.beginPath()
     let v = MathEx.translate(p, particle.position)

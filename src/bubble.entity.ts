@@ -6,6 +6,7 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
+import { PIx2 } from "./math-ex"
 import { GameEntity } from "./game-entity"
 import { ParticleSystem } from "./particle.system"
 import { DecaySystem } from "./decay.system"
@@ -17,8 +18,10 @@ export class BubbleEntity extends GameEntity {
     decaySystem: DecaySystem
   ) {
     super()
-    particleSystem.attachComponent(this)
+    const particle = <ParticleComponent>particleSystem.attachComponent(this)
     decaySystem.attachComponent(this)
+    particle.radius = 2
+    particle.padding = 1
   }
   draw(g: CanvasRenderingContext2D): void {
     console.assert(this.components.has(GameComponentKinds.Particle),
@@ -28,7 +31,7 @@ export class BubbleEntity extends GameEntity {
     g.strokeStyle = "blue"
     g.lineWidth = 1
     g.beginPath()
-    g.arc(particle.position[0], particle.position[1], 2, 0, 2 * Math.PI)
+    g.arc(particle.position[0], particle.position[1], particle.radius, 0, PIx2)
     g.stroke()
   }
 }
