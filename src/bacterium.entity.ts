@@ -20,17 +20,20 @@ import {
 } from "./components";
 import { PIx2 } from "./math-ex";
 import { SignalSystem } from "./signal.system";
+import { SensorSystem } from "./sensor.system";
 
 export class BacteriumEntity extends GameEntity {
   constructor(
     particleSystem: ParticleSystem,
     decaySystem: DecaySystem,
-    signalSystem: SignalSystem
+    signalSystem: SignalSystem,
+    sensorSystem: SensorSystem
   ) {
     super()
     const particle = <ParticleComponent>particleSystem.attachComponent(this)
     const decay = <DecayComponent>decaySystem.attachComponent(this)
     const signal = <SignalComponent>signalSystem.attachComponent(this)
+    sensorSystem.attachComponent(this)
     signal.signature = 1 / 4
     signal.radius = 30
     decay.durability *= 8

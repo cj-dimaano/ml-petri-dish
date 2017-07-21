@@ -14,6 +14,7 @@ import { BacteriumEntity } from "./bacterium.entity"
 import { ParticleSystem } from "./particle.system"
 import { DecaySystem } from "./decay.system"
 import { SignalSystem } from "./signal.system";
+import { SensorSystem } from "./sensor.system";
 
 /**
  * @summary
@@ -29,12 +30,14 @@ export class FiatSystem extends GameSystem {
     this.particleSystem = new ParticleSystem(screenHeight, screenWidth)
     this.decaySystem = new DecaySystem()
     this.signalSystem = new SignalSystem()
+    this.sensorSystem = new SensorSystem(this.signalSystem)
     this.updateProbabilities()
   }
 
   private particleSystem: ParticleSystem
   private decaySystem: DecaySystem
   private signalSystem: SignalSystem
+  private sensorSystem: SensorSystem
   // private replicateSystem: ReplicateSystem
 
   private pBubbles: number = 0
@@ -81,7 +84,8 @@ export class FiatSystem extends GameSystem {
         new BacteriumEntity(
           this.particleSystem,
           this.decaySystem,
-          this.signalSystem)
+          this.signalSystem,
+          this.sensorSystem)
       )
       updateProbabilities = true
     }
