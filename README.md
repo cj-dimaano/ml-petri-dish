@@ -14,6 +14,9 @@ Make sure you have Node.JS installed.
 ```
 $ node -v
 v8.1.4
+```
+
+```
 $ npm -v
 5.3.0
 ```
