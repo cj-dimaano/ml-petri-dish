@@ -30,7 +30,7 @@ export class ParticleSystem extends GameComponentSystem {
       }
       if (v[i] < 0 && min > x) {
         v[i] *= -1
-        return min - x
+        return min + (x - min)
       }
       return x
     }
