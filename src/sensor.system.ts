@@ -50,8 +50,6 @@ export class SensorSystem extends GameComponentSystem {
             }
           }
         )
-        if (sensor.detected.size > 0)
-          console.log(sensor.detected.size)
       }
     )
   }
