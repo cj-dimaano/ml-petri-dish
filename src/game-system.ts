@@ -53,7 +53,7 @@ export abstract class GameComponentSystem extends GameSystem {
    * @summary
    *   The set of components belonging to this particular system.
    */
-  protected components: GameComponent[] = []
+  components: GameComponent[] = []
 
   /**
    * @summary
