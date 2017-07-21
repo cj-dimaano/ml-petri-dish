@@ -25,7 +25,8 @@ export enum GameComponentKinds {
   Replicate,
   Signal,
   Sensor,
-  Absorb
+  Absorb,
+  ML
 }
 
 /**
@@ -101,17 +102,16 @@ export class EnergyComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.Energy, host)
   }
-  applyAcceleration: boolean = false
-  applyAngularAcceleration: boolean = false
   /**
    * change in velocity per second as the magnitude of its velocity vector;
    * also applies to angular acceleration, measured in radians per second
    * @todo
-   *   acceleration modifiers?
+   *   acceleration modifiers from proteins?
    */
-  acceleration: number = 1
+  acceleration: number = 0
+  angularAcceleration: number = 0
   /**
-   * 1 fuel = 1 second of [angular]acceleration
+   * 1 fuel = 1 second of 1 [angular]acceleration
    */
   fuel: number = 0
 }
@@ -156,8 +156,25 @@ export class SensorComponent extends GameComponent {
   detected: Set<GameEntity> = new Set<GameEntity>()
 }
 
+/**
+ * @todo
+ *   some property that could be useful for keeping score, or drawing the
+ *   entity
+ */
 export class AbsorbComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.Absorb, host)
+  }
+}
+
+/**
+ * @todo
+ *   should this cost energy?
+ *   maybe computations should happen in steps so that each update will have its
+ *   own associated computation
+ */
+export class MLComponent extends GameComponent {
+  constructor(host: GameEntity) {
+    super(GameComponentKinds.ML, host)
   }
 }
