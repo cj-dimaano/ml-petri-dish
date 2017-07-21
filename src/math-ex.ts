@@ -38,6 +38,10 @@ export function translate(v: vec2, u: vec2): vec2 {
   return [v[0] + u[0], v[1] + u[1]]
 }
 
+export function subtract(v: vec2, u: vec2): vec2 {
+  return [v[0] - u[0], v[1] - u[1]]
+}
+
 /**
  * @summary
  *   Produces a new vector rotated by the given vector and radians.
