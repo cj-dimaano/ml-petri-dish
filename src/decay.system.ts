@@ -19,7 +19,10 @@ export class DecaySystem extends GameComponentSystem {
     this.components.forEach(
       (value) => {
         const decay = <DecayComponent>value
-        if (Math.random() < decay.calculateProbability(dt))
+        decay.lifespan += dt
+        if (Math.random() < decay.lifespan
+          / (decay.durability + decay.lifespan)
+          / decay.durability)
           decay.host.dispose()
       }
     )
