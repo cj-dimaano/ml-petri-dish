@@ -25,6 +25,7 @@ export enum GameComponentKinds {
   Replicate,
   Signal,
   Sensor,
+  Absorb
 }
 
 /**
@@ -92,12 +93,8 @@ export class DecayComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.Decay, host)
   }
-  private lifespan: number = 0
+  lifespan: number = 0
   durability: number = 1000
-  calculateProbability(dt: number): number {
-    this.lifespan += dt
-    return this.lifespan / (this.durability + this.lifespan) / this.durability
-  }
 }
 
 export class EnergyComponent extends GameComponent {
@@ -157,4 +154,10 @@ export class SensorComponent extends GameComponent {
     super(GameComponentKinds.Sensor, host)
   }
   detected: Set<GameEntity> = new Set<GameEntity>()
+}
+
+export class AbsorbComponent extends GameComponent {
+  constructor(host: GameEntity) {
+    super(GameComponentKinds.Absorb, host)
+  }
 }
