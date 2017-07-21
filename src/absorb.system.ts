@@ -62,8 +62,8 @@ export class AbsorbSystem extends GameComponentSystem {
             if (target instanceof BubbleEntity) {
               // @todo
               // use growth level of target to determine energy amount
-              target.dispose()
               energy.fuel += 1
+              target.dispose()
               return
             }
           }
