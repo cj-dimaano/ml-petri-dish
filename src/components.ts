@@ -25,7 +25,6 @@ export enum GameComponentKinds {
   Replicate,
   Signal,
   Sensor,
-  Overlap
 }
 
 /**
