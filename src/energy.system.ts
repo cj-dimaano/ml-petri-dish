@@ -49,13 +49,15 @@ export class EnergySystem extends GameComponentSystem {
           MathEx._scale(u, accel)
           energy.fuel -= (sec < energy.fuel ? sec : energy.fuel)
         }
+        else
+          MathEx._scale(u, 0)
 
         // Apply angular acceleration.
         // > In reality, angular acceleration would cause the particle to rotate
         // > in the opposite direction. Here, we don't really care which
         // > direction rotation occurs.
         if (energy.applyAngularAcceleration && energy.fuel > 0) {
-          MathEx._rotate(u, accel)
+          particle.angularVelocity += accel
           energy.fuel -= (sec < energy.fuel ? sec : energy.fuel)
         }
 
