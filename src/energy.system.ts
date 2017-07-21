@@ -42,32 +42,28 @@ export class EnergySystem extends GameComponentSystem {
         const u = MathEx.rotate([1, 0], particle.angle)
 
         // Calculate acceleration.
-        const accel = sec * energy.acceleration
+        let accel = sec * energy.acceleration
 
         // Apply linear acceleration.
-        if (energy.applyAcceleration && energy.fuel > 0) {
-          MathEx._scale(u, accel)
-          energy.fuel -= (sec < energy.fuel ? sec : energy.fuel)
-        }
-        else
-          MathEx._scale(u, 0)
+        accel = energy.fuel < accel ? energy.fuel : accel
+        MathEx._scale(u, accel)
+        energy.fuel -= accel
+        MathEx._translate(particle.velocity, u)
 
         // Apply angular acceleration.
         // > In reality, angular acceleration would cause the particle to rotate
         // > in the opposite direction. Here, we don't really care which
         // > direction rotation occurs.
-        if (energy.applyAngularAcceleration && energy.fuel > 0) {
-          particle.angularVelocity += accel
-          energy.fuel -= (sec < energy.fuel ? sec : energy.fuel)
-        }
-
-        // Apply acceleration to velocity.
-        MathEx._translate(particle.velocity, u)
+        accel = sec * energy.angularAcceleration
+        accel = energy.fuel < accel ? energy.fuel : accel
+        particle.angularVelocity += accel
+        energy.fuel -= accel
 
         // Limit maximum velocity.
         const mag = MathEx.dot(particle.velocity, particle.velocity)
         if (mag > 900)
           MathEx._scale(particle.velocity, 900 / mag)
+        particle.angularVelocity = Math.min(particle.angularVelocity, 30)
       }
     )
   }
