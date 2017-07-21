@@ -51,6 +51,7 @@ export class FiatSystem extends GameSystem {
   update(dt: number): void {
     this.decaySystem.update(dt)
     this.signalSystem.update(dt)
+    this.sensorSystem.update(dt)
     this.particleSystem.update(dt)
     const sec = dt / 1000
     let updateProbabilities = false
