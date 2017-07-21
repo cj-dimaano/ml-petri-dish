@@ -15,6 +15,8 @@ import { ParticleSystem } from "./particle.system"
 import { DecaySystem } from "./decay.system"
 import { SignalSystem } from "./signal.system";
 import { SensorSystem } from "./sensor.system";
+import { EnergySystem } from "./energy.system";
+import { AbsorbSystem } from "./absorb.system";
 
 /**
  * @summary
@@ -31,6 +33,8 @@ export class FiatSystem extends GameSystem {
     this.decaySystem = new DecaySystem()
     this.signalSystem = new SignalSystem()
     this.sensorSystem = new SensorSystem(this.signalSystem)
+    this.energySystem = new EnergySystem()
+    this.absorbSystem = new AbsorbSystem()
     this.updateProbabilities()
   }
 
@@ -38,6 +42,8 @@ export class FiatSystem extends GameSystem {
   private decaySystem: DecaySystem
   private signalSystem: SignalSystem
   private sensorSystem: SensorSystem
+  private energySystem: EnergySystem
+  private absorbSystem: AbsorbSystem
   // private replicateSystem: ReplicateSystem
 
   private pBubbles: number = 0
@@ -52,6 +58,8 @@ export class FiatSystem extends GameSystem {
     this.decaySystem.update(dt)
     this.signalSystem.update(dt)
     this.sensorSystem.update(dt)
+    this.absorbSystem.update(dt)
+    this.energySystem.update(dt)
     this.particleSystem.update(dt)
     const sec = dt / 1000
     let updateProbabilities = false
@@ -86,7 +94,9 @@ export class FiatSystem extends GameSystem {
           this.particleSystem,
           this.decaySystem,
           this.signalSystem,
-          this.sensorSystem)
+          this.sensorSystem,
+          this.energySystem,
+          this.absorbSystem)
       )
       updateProbabilities = true
     }
