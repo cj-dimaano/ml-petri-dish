@@ -36,17 +36,19 @@ export class SensorSystem extends GameComponentSystem {
         sensor.detected.clear()
         this.signalSystem.components.forEach(
           (signalValue) => {
-            const signalHost = signalValue.host
-            if (signalHost !== host) {
-              const signal = <SignalComponent>signalValue
-              const signalPartical = <ParticleComponent>signalHost.components
-                .get(GameComponentKinds.Particle)
-              const sr2 = signal.radius * signal.radius
-              const v
-                = MathEx.subtract(particle.position, signalPartical.position)
-              const d = MathEx.dot(v, v)
-              if (d - r2 - sr2 < 0)
-                sensor.detected.add(signalHost)
+            if (sensor.detected.size < sensor.limit) {
+              const signalHost = signalValue.host
+              if (signalHost !== host) {
+                const signal = <SignalComponent>signalValue
+                const signalPartical = <ParticleComponent>signalHost.components
+                  .get(GameComponentKinds.Particle)
+                const sr2 = signal.radius * signal.radius
+                const v
+                  = MathEx.subtract(particle.position, signalPartical.position)
+                const d = MathEx.dot(v, v)
+                if (d - r2 - sr2 < 0)
+                  sensor.detected.add(signalHost)
+              }
             }
           }
         )
