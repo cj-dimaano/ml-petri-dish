@@ -31,6 +31,7 @@ export class AbsorbSystem extends GameComponentSystem {
     this.components.forEach(
       (value) => {
         const host = value.host
+        const absorb = <AbsorbComponent>value
         const particle = <ParticleComponent>host.components
           .get(GameComponentKinds.Particle)!
         const sensor = <SensorComponent>host.components
@@ -54,8 +55,8 @@ export class AbsorbSystem extends GameComponentSystem {
             if (target instanceof LongevityProteinEntity) {
               const targetDecay = <DecayComponent>target.components
                 .get(GameComponentKinds.Decay)!
-              decay.lifespan
-                -= (2 * targetDecay.durability - targetDecay.lifespan)
+              absorb.durabilityBonus
+                += (2 * targetDecay.durability - targetDecay.lifespan)
               target.dispose()
               return
             }

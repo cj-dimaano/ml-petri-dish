@@ -8,7 +8,11 @@
 
 import { GameComponentSystem } from "./game-system";
 import { GameEntity } from "./game-entity";
-import { DecayComponent, GameComponentKinds } from "./components";
+import {
+  DecayComponent,
+  GameComponentKinds,
+  AbsorbComponent
+} from "./components";
 
 export class DecaySystem extends GameComponentSystem {
   constructor() { super(GameComponentKinds.Decay) }
@@ -19,10 +23,17 @@ export class DecaySystem extends GameComponentSystem {
     this.components.forEach(
       (value) => {
         const decay = <DecayComponent>value
+        let durability = decay.durability
+        if (decay.host.components.has(GameComponentKinds.Absorb)) {
+          const absorb = <AbsorbComponent>decay.host.components
+            .get(GameComponentKinds.Absorb)!
+          absorb.durabilityBonus = Math.max(absorb.durabilityBonus - dt, 0)
+          durability += absorb.durabilityBonus
+        }
         decay.lifespan += dt
         if (Math.random() < decay.lifespan
-          / (decay.durability + decay.lifespan)
-          / decay.durability)
+          / (durability + decay.lifespan)
+          / durability)
           decay.host.dispose()
       }
     )
