@@ -18,7 +18,7 @@ export class AVLTree<K, V> {
       return 1
     return 0
   }
-  private root: AVLNode<K, V> | null
+  private root: AVLNode<K, V> | null = null
   get(key: K): V | undefined {
     const node = this.getNode(key)
     return node === null ? undefined : node.value
