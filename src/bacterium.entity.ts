@@ -24,6 +24,7 @@ import { SignalSystem } from "./signal.system";
 import { SensorSystem } from "./sensor.system";
 import { EnergySystem } from "./energy.system";
 import { AbsorbSystem } from "./absorb.system";
+import { MLSystem } from "./ml.system";
 
 export class BacteriumEntity extends GameEntity {
   constructor(
@@ -32,7 +33,8 @@ export class BacteriumEntity extends GameEntity {
     signalSystem: SignalSystem,
     sensorSystem: SensorSystem,
     energySystem: EnergySystem,
-    absorbSystem: AbsorbSystem
+    absorbSystem: AbsorbSystem,
+    mlSystem: MLSystem
   ) {
     super()
     const particle = <ParticleComponent>particleSystem.attachComponent(this)
@@ -41,6 +43,7 @@ export class BacteriumEntity extends GameEntity {
     sensorSystem.attachComponent(this)
     const energy = <EnergyComponent>energySystem.attachComponent(this)
     absorbSystem.attachComponent(this)
+    mlSystem.attachComponent(this)
     energy.fuel = 5
     signal.signature = 1 / 4
     signal.radius = 30

@@ -17,6 +17,7 @@ import { SignalSystem } from "./signal.system";
 import { SensorSystem } from "./sensor.system";
 import { EnergySystem } from "./energy.system";
 import { AbsorbSystem } from "./absorb.system";
+import { MLSystem } from "./ml.system";
 
 /**
  * @summary
@@ -35,6 +36,8 @@ export class FiatSystem extends GameSystem {
     this.sensorSystem = new SensorSystem(this.signalSystem)
     this.energySystem = new EnergySystem()
     this.absorbSystem = new AbsorbSystem()
+    // this.replicateSystem = new ReplicateSystem()
+    this.mlSystem = new MLSystem()
     this.updateProbabilities()
   }
 
@@ -45,6 +48,7 @@ export class FiatSystem extends GameSystem {
   private energySystem: EnergySystem
   private absorbSystem: AbsorbSystem
   // private replicateSystem: ReplicateSystem
+  private mlSystem: MLSystem
 
   private pBubbles: number = 0
   private pProteins: number = 0
@@ -59,6 +63,7 @@ export class FiatSystem extends GameSystem {
     this.signalSystem.update(dt)
     this.sensorSystem.update(dt)
     this.absorbSystem.update(dt)
+    this.mlSystem.update(dt)
     this.energySystem.update(dt)
     this.particleSystem.update(dt)
     const sec = dt / 1000
@@ -96,7 +101,9 @@ export class FiatSystem extends GameSystem {
           this.signalSystem,
           this.sensorSystem,
           this.energySystem,
-          this.absorbSystem)
+          this.absorbSystem,
+          // this.replicateSystem,
+          this.mlSystem)
       )
       updateProbabilities = true
     }
@@ -106,9 +113,9 @@ export class FiatSystem extends GameSystem {
 
   updateProbabilities(): void {
     const bubbles = this.bubbles.length + 4 * this.bacteria.length
-    this.pBubbles = 1 - bubbles / (30 + bubbles)
+    this.pBubbles = 1 - bubbles / (300 + bubbles)
 
     const proteins = this.proteins.length + 12 * this.bacteria.length
-    this.pProteins = 1 - proteins / (100 + proteins)
+    this.pProteins = 1 - proteins / (900 + proteins)
   }
 }

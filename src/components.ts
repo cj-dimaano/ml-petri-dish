@@ -6,8 +6,11 @@
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-import { vec2 } from "./math-ex"
+import { vec2, subtract, dot } from "./math-ex"
+import { AVLTree } from "./avl-tree"
 import { GameEntity } from "./game-entity"
+import { ANN } from "./ann";
+import { QState } from "./q-state";
 
 /**
  * @summary
@@ -22,7 +25,6 @@ export enum GameComponentKinds {
   Growth,
   Decay,
   Energy,
-  Replicate,
   Signal,
   Sensor,
   Absorb,
@@ -103,8 +105,8 @@ export class EnergyComponent extends GameComponent {
     super(GameComponentKinds.Energy, host)
   }
   /**
-   * change in velocity per second as the magnitude of its velocity vector;
-   * also applies to angular acceleration, measured in radians per second
+   * change in velocity as the magnitude of its velocity vector; also applies to
+   * angular acceleration, measured in degrees
    * @todo
    *   acceleration modifiers from proteins?
    */
@@ -114,25 +116,6 @@ export class EnergyComponent extends GameComponent {
    * 1 fuel = 1 second of 1 [angular]acceleration
    */
   fuel: number = 0
-}
-
-/**
- * @todo
- *   When replicating an entity, be sure to mutate ANN
- */
-export class ReplicateComponent extends GameComponent {
-  constructor(host: GameEntity) {
-    super(GameComponentKinds.Replicate, host)
-  }
-  calculateProbability(): number {
-    console.assert(this.host.components.has(GameComponentKinds.Energy),
-      "error: host entity does not have an EnergyComponent"
-    )
-    const energyComponent = this.host.components.get(GameComponentKinds.Energy)!
-    const fuel = (<EnergyComponent>energyComponent).fuel
-    // At 80 fuel, there is an 80% probability of replication.
-    return fuel / (20 + fuel)
-  }
 }
 
 export class SignalComponent extends GameComponent {
@@ -158,13 +141,13 @@ export class SensorComponent extends GameComponent {
 
 /**
  * @todo
- *   some property that could be useful for keeping score, or drawing the
- *   entity
+ *   bonus stats
  */
 export class AbsorbComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.Absorb, host)
   }
+  durabilityBonus: number = 0
 }
 
 /**
@@ -172,9 +155,26 @@ export class AbsorbComponent extends GameComponent {
  *   should this cost energy?
  *   maybe computations should happen in steps so that each update will have its
  *   own associated computation
+ * 
+ * @description
+ *   The ML technique uses Reinforcement Learning. Each state is an array of
+ *   numerical values of the form
+ *   [
+ *     energy.fuel,
+ *     sensor.detected[0].position (relative to sensor.host),
+ *                       .signature (3 features),
+ *     ...
+ *     sensor.detected[6] ... (the sensor detected limit)
+ *   ]
+ *   and an action is an array of two numbers (max 1), with the first value
+ *   representing linear acceleration and the second representing angular
+ *   acceleration.
  */
 export class MLComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.ML, host)
   }
+  previousState: QState
+  Q = new AVLTree<QState, number>((a, b) => a.compare(b))
+  ann = new ANN(24, 3, 3, 2)
 }
