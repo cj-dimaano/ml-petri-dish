@@ -24,7 +24,7 @@ export class EnergySystem extends GameComponentSystem {
 
   update(dt: number): void {
     // Get the delta time in seconds.
-    const sec = dt / 1000
+    const sec = dt / 10
 
     // Update each component.
     this.components.forEach(
@@ -56,14 +56,15 @@ export class EnergySystem extends GameComponentSystem {
         // > direction rotation occurs.
         accel = sec * energy.angularAcceleration
         accel = energy.fuel < accel ? energy.fuel : accel
-        particle.angularVelocity += accel
+        particle.angularVelocity += accel * Math.PI / 180
         energy.fuel -= accel
 
         // Limit maximum velocity.
-        const mag = MathEx.dot(particle.velocity, particle.velocity)
-        if (mag > 900)
-          MathEx._scale(particle.velocity, 900 / mag)
-        particle.angularVelocity = Math.min(particle.angularVelocity, 30)
+        const mag = MathEx.magnitude(particle.velocity)
+        if (mag > 30)
+          MathEx._scale(particle.velocity, 30 / mag)
+        particle.angularVelocity
+          = Math.min(particle.angularVelocity, Math.PI / 6)
       }
     )
   }
