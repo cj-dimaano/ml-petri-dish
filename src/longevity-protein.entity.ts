@@ -28,7 +28,7 @@ export class LongevityProteinEntity extends GameEntity {
     const decay = <DecayComponent>decaySystem.attachComponent(this)
     const signal = <SignalComponent>signalSystem.attachComponent(this)
     signal.signature = 3 / 4
-    signal.radius = 20
+    signal.radius = 60
     decay.durability *= 10
     particle.velocity[0] = 5 - 10 * Math.random()
     particle.velocity[1] = 5 - 10 * Math.random()
