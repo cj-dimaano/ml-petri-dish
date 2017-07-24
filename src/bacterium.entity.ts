@@ -47,7 +47,7 @@ export class BacteriumEntity extends GameEntity {
     energy.fuel = 5
     signal.signature = 1 / 4
     signal.radius = 30
-    decay.durability *= 2
+    decay.durability *= 4
     particle.velocity[0] = 1 - 2 * Math.random()
     particle.velocity[1] = 1 - 2 * Math.random()
     particle.angularVelocity = 0.01 - 0.02 * Math.random()
@@ -65,14 +65,15 @@ export class BacteriumEntity extends GameEntity {
     g.beginPath()
     g.arc(p[0], p[1], r1, 0, PIx2)
     g.stroke()
-    for (let i = 0; i < PIx2; i += PIx2 / 5) {
-      g.beginPath()
-      g.arc(
-        p[0], p[1],
-        r2,
-        i + particle.angle,
-        Math.PI / 4 + i + particle.angle)
-      g.stroke()
-    }
+    // for (let i = -PIx2 / 10; i < PIx2; i += PIx2 / 5) {
+    let i = -PIx2 / 10
+    g.beginPath()
+    g.arc(
+      p[0], p[1],
+      r2,
+      i + particle.angle,
+      Math.PI / 4 + i + particle.angle)
+    g.stroke()
+    // }
   }
 }
