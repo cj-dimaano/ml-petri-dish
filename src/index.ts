@@ -43,7 +43,11 @@ function init() {
   g = <CanvasRenderingContext2D>canvas.getContext("2d")
   screenHeight = canvas.clientHeight
   screenWidth = canvas.clientWidth
-  fiatSystem = new FiatSystem(screenHeight, screenWidth)
+  fiatSystem = new FiatSystem()
+  fiatSystem.particleSystem.screenHeight = screenHeight
+  fiatSystem.particleSystem.screenWidth = screenWidth
+  fiatSystem.sensorSystem.signalSystem = fiatSystem.signalSystem
+  fiatSystem.replicateSystem.fiatSystem = fiatSystem
   window.requestAnimationFrame(updateAndDraw)
 }
 

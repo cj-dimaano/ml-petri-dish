@@ -18,6 +18,7 @@ import { SensorSystem } from "./sensor.system";
 import { EnergySystem } from "./energy.system";
 import { AbsorbSystem } from "./absorb.system";
 import { MLSystem } from "./ml.system";
+import { ReplicateSystem } from "./replicate.system";
 
 /**
  * @summary
@@ -28,37 +29,30 @@ import { MLSystem } from "./ml.system";
  *   entity spawning as a function of the number of entities present.
  */
 export class FiatSystem extends GameSystem {
-  constructor(screenHeight: number, screenWidth: number) {
+  constructor() {
     super()
-    this.particleSystem = new ParticleSystem(screenHeight, screenWidth)
-    this.decaySystem = new DecaySystem()
-    this.signalSystem = new SignalSystem()
-    this.sensorSystem = new SensorSystem(this.signalSystem)
-    this.energySystem = new EnergySystem()
-    this.absorbSystem = new AbsorbSystem()
-    // this.replicateSystem = new ReplicateSystem()
-    this.mlSystem = new MLSystem()
     this.updateProbabilities()
   }
 
-  private particleSystem: ParticleSystem
-  private decaySystem: DecaySystem
-  private signalSystem: SignalSystem
-  private sensorSystem: SensorSystem
-  private energySystem: EnergySystem
-  private absorbSystem: AbsorbSystem
-  // private replicateSystem: ReplicateSystem
-  private mlSystem: MLSystem
-
   private pBubbles: number = 0
   private pProteins: number = 0
-  private pBacteria: number = 0.01
+  private pBacteria: number = 0
 
   bacteria: BacteriumEntity[] = []
   bubbles: BubbleEntity[] = []
   proteins: LongevityProteinEntity[] = []
 
+  readonly particleSystem: ParticleSystem = new ParticleSystem()
+  readonly decaySystem: DecaySystem = new DecaySystem()
+  readonly signalSystem: SignalSystem = new SignalSystem()
+  readonly sensorSystem: SensorSystem = new SensorSystem()
+  readonly energySystem: EnergySystem = new EnergySystem()
+  readonly absorbSystem: AbsorbSystem = new AbsorbSystem()
+  readonly replicateSystem: ReplicateSystem = new ReplicateSystem()
+  readonly mlSystem: MLSystem = new MLSystem()
+
   update(dt: number): void {
+    this.replicateSystem.update(dt)
     this.decaySystem.update(dt)
     this.signalSystem.update(dt)
     this.sensorSystem.update(dt)
@@ -77,7 +71,8 @@ export class FiatSystem extends GameSystem {
     this.bubbles = this.bubbles.filter(filterFn)
     this.proteins = this.proteins.filter(filterFn)
     this.bacteria = this.bacteria.filter(filterFn)
-    if (Math.random() < this.pBubbles * sec) {
+    if (this.bubbles.length < 15) {
+    // if (Math.random() < this.pBubbles * sec) {
       this.bubbles.push(
         new BubbleEntity(
           this.particleSystem,
@@ -85,7 +80,8 @@ export class FiatSystem extends GameSystem {
           this.signalSystem))
       updateProbabilities = true
     }
-    if (Math.random() < this.pProteins * sec) {
+    if (this.proteins.length < 20) {
+    // if (Math.random() < this.pProteins * sec) {
       this.proteins.push(
         new LongevityProteinEntity(
           this.particleSystem,
@@ -93,19 +89,10 @@ export class FiatSystem extends GameSystem {
           this.signalSystem))
       updateProbabilities = true
     }
-    if (Math.random() < this.pBacteria * sec) {
-      this.bacteria.push(
-        new BacteriumEntity(
-          this.particleSystem,
-          this.decaySystem,
-          this.signalSystem,
-          this.sensorSystem,
-          this.energySystem,
-          this.absorbSystem,
-          // this.replicateSystem,
-          this.mlSystem)
-      )
-      updateProbabilities = true
+    if (this.bacteria.length < 10) {
+    // if (Math.random() < this.pBacteria * sec) {
+      this.addBacterium()
+      updateProbabilities = false
     }
     if (updateProbabilities)
       this.updateProbabilities()
@@ -113,9 +100,26 @@ export class FiatSystem extends GameSystem {
 
   updateProbabilities(): void {
     const bubbles = this.bubbles.length + 4 * this.bacteria.length
-    this.pBubbles = 1 - bubbles / (300 + bubbles)
+    this.pBubbles = 1 - bubbles / (900 + bubbles)
+    // this.pBubbles = 1 - bubbles / (300 + bubbles)
 
     const proteins = this.proteins.length + 12 * this.bacteria.length
     this.pProteins = 1 - proteins / (900 + proteins)
+
+    const bacteria = this.bacteria.length
+    this.pBacteria = 1 - 1 / (1 + Math.pow(2, -bacteria / 3))
+  }
+  addBacterium(): BacteriumEntity {
+    const bacterium = new BacteriumEntity(
+      this.particleSystem,
+      this.decaySystem,
+      this.signalSystem,
+      this.sensorSystem,
+      this.energySystem,
+      this.absorbSystem,
+      this.mlSystem)
+    this.bacteria.push(bacterium)
+    this.updateProbabilities()
+    return bacterium
   }
 }
