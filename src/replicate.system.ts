@@ -37,8 +37,9 @@ export class ReplicateSystem extends GameSystem {
         const durabilityBonus = absorb.durabilityBonus
         // At 10 fuel && bonusDurability === 2x durability, there is a 50%
         // probability of replication per second.
-        if (Math.random() < sec / (1 + Math.pow(2, -(fuel - 10) / 2))
-          && Math.random()
+        const rng = Math.random()
+        if (rng < sec / (1 + Math.pow(2, -(fuel - 10) / 2))
+          && rng
           < sec / (1 + Math.pow(2, -(durabilityBonus - 2 * durability) / 2))) {
           const particle = <ParticleComponent>value.components
             .get(GameComponentKinds.Particle)
