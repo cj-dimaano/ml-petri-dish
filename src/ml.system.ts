@@ -36,17 +36,20 @@ export class MLSystem extends GameComponentSystem {
         const sensor = <SensorComponent>host.components
           .get(GameComponentKinds.Sensor)!
         const state = new QState(energy, particle, sensor.detected)
+        const action = ml.ann.chooseAction(state.features)
+        const acceleration = Math.round(action[1])
+        const angularAcceleration = Math.round(1 - 2 * action[2])
+        state.features.push(acceleration, angularAcceleration)
         if (ml.previousState !== undefined) {
           const Dy = ml.previousState.features[0] - state.features[0]
           let Q = MLComponent.Q.get(ml.previousState)
           Q = Q === undefined ? 0 : Q
           ml.ann.updateWeights(Dy - Q)
-          MLComponent.Q.set(state, Dy + 0.95 * Q)
+          MLComponent.Q.set(state, Dy + 0.8 * Q)
         }
         ml.previousState = state
-        const action = ml.ann.chooseAction(state.features)
-        energy.acceleration = Math.round(action[1])
-        energy.angularAcceleration = Math.round(1 - 2 * action[2])
+        energy.acceleration = acceleration
+        energy.angularAcceleration = angularAcceleration
       }
     )
   }
