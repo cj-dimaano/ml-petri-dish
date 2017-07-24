@@ -13,7 +13,9 @@ import {
   SignalComponent
 } from "./components";
 import { GameEntity } from "./game-entity";
-import { subtract, _rotate } from "./math-ex";
+import { subtract, _rotate, dot } from "./math-ex";
+
+export const FEATURE_COUNT = 26
 
 /**
  * @summary
@@ -37,11 +39,13 @@ export class QState {
     this.features.push(
       Math.round(energy.fuel),
       energy.acceleration,
-      energy.angularAcceleration
+      energy.angularAcceleration,
+      particle.angularVelocity,
+      dot(particle.velocity, particle.velocity)
     )
     detected.forEach(
       (value) => {
-        if (this.features.length === 24)
+        if (this.features.length === FEATURE_COUNT)
           return
         const dParticle = <ParticleComponent>value.components
           .get(GameComponentKinds.Particle)!
@@ -56,7 +60,7 @@ export class QState {
         )
       }
     )
-    while (this.features.length < 24)
+    while (this.features.length < FEATURE_COUNT)
       this.features.push(0)
   }
   readonly features: number[] = []

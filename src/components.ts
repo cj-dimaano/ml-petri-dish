@@ -10,7 +10,7 @@ import { vec2, subtract, dot } from "./math-ex"
 import { AVLTree } from "./avl-tree"
 import { GameEntity } from "./game-entity"
 import { ANN } from "./ann";
-import { QState } from "./q-state";
+import { QState, FEATURE_COUNT } from "./q-state";
 
 /**
  * @summary
@@ -175,6 +175,6 @@ export class MLComponent extends GameComponent {
     super(GameComponentKinds.ML, host)
   }
   previousState: QState
-  Q = new AVLTree<QState, number>((a, b) => a.compare(b))
-  ann = new ANN(24, 3, 3, 2)
+  static Q = new AVLTree<QState, number>((a, b) => a.compare(b))
+  ann = new ANN(FEATURE_COUNT, 3, 4, 2)
 }
