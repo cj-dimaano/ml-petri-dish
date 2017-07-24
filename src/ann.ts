@@ -90,6 +90,20 @@ export class ANN {
     }
     this.w = w
   }
+  copyWeights(source: ANN, mutate: number = 0) {
+    this.w = []
+    for (const layer of source.w) {
+      const newLayer: number[][] = []
+      for (const row of layer) {
+        newLayer.push(
+          row.map(
+            (value) => Math.random() < mutate ? 1 - 2 * Math.random() : value
+          )
+        )
+      }
+      this.w.push(newLayer)
+    }
+  }
   private propagate(l: number, n: number, j: number): number {
     let result = 0
     console.assert(j < this.z[l].length,
