@@ -57,7 +57,7 @@ export class EnergySystem extends GameComponentSystem {
         accel = sec * energy.angularAcceleration
         accel = energy.fuel < accel ? energy.fuel : accel
         particle.angularVelocity += accel
-        energy.fuel -= accel
+        energy.fuel -= Math.abs(accel)
 
         // Limit maximum velocity.
         const mag = MathEx.magnitude(particle.velocity)
