@@ -38,10 +38,10 @@ export class MLSystem extends GameComponentSystem {
         const state = new QState(energy, particle, sensor.detected)
         if (ml.previousState !== undefined) {
           const Dy = ml.previousState.features[0] - state.features[0]
-          let Q = ml.Q.get(ml.previousState)
+          let Q = MLComponent.Q.get(ml.previousState)
           Q = Q === undefined ? 0 : Q
           ml.ann.updateWeights(Dy - Q)
-          ml.Q.set(state, Dy + 0.95 * Q)
+          MLComponent.Q.set(state, Dy + 0.95 * Q)
         }
         ml.previousState = state
         const action = ml.ann.chooseAction(state.features)
