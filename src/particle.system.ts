@@ -59,7 +59,7 @@ export class ParticleSystem extends GameComponentSystem {
           this.screenHeight - pad,
           particle.velocity,
           1)
-        particle.angle += particle.angularVelocity
+        particle.angle += sec * particle.angularVelocity
       }
     )
   }
