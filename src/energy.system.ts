@@ -56,7 +56,7 @@ export class EnergySystem extends GameComponentSystem {
         // > direction rotation occurs.
         accel = sec * energy.angularAcceleration
         accel = energy.fuel < accel ? energy.fuel : accel
-        particle.angularVelocity += accel * Math.PI / 180
+        particle.angularVelocity += accel
         energy.fuel -= accel
 
         // Limit maximum velocity.
@@ -64,7 +64,7 @@ export class EnergySystem extends GameComponentSystem {
         if (mag > 30)
           MathEx._scale(particle.velocity, 30 / mag)
         particle.angularVelocity
-          = Math.min(particle.angularVelocity, Math.PI / 90)
+          = Math.min(particle.angularVelocity, Math.PI)
       }
     )
   }
