@@ -71,8 +71,8 @@ export class FiatSystem extends GameSystem {
     this.bubbles = this.bubbles.filter(filterFn)
     this.proteins = this.proteins.filter(filterFn)
     this.bacteria = this.bacteria.filter(filterFn)
-    if (this.bubbles.length < 15) {
-    // if (Math.random() < this.pBubbles * sec) {
+    // if (this.bubbles.length < 15) {
+    if (Math.random() < this.pBubbles * sec) {
       this.bubbles.push(
         new BubbleEntity(
           this.particleSystem,
@@ -80,8 +80,8 @@ export class FiatSystem extends GameSystem {
           this.signalSystem))
       updateProbabilities = true
     }
-    if (this.proteins.length < 20) {
-    // if (Math.random() < this.pProteins * sec) {
+    // if (this.proteins.length < 40) {
+    if (Math.random() < this.pProteins * sec) {
       this.proteins.push(
         new LongevityProteinEntity(
           this.particleSystem,
@@ -89,8 +89,8 @@ export class FiatSystem extends GameSystem {
           this.signalSystem))
       updateProbabilities = true
     }
-    if (this.bacteria.length < 10) {
-    // if (Math.random() < this.pBacteria * sec) {
+    // if (this.bacteria.length < 10) {
+    if (Math.random() < this.pBacteria * sec) {
       this.addBacterium()
       updateProbabilities = false
     }
@@ -100,14 +100,14 @@ export class FiatSystem extends GameSystem {
 
   updateProbabilities(): void {
     const bubbles = this.bubbles.length + 4 * this.bacteria.length
-    this.pBubbles = 1 - bubbles / (900 + bubbles)
-    // this.pBubbles = 1 - bubbles / (300 + bubbles)
+    // this.pBubbles = 1 - bubbles / (900 + bubbles)
+    this.pBubbles = 1 - bubbles / (1000 + bubbles)
 
     const proteins = this.proteins.length + 12 * this.bacteria.length
-    this.pProteins = 1 - proteins / (900 + proteins)
+    this.pProteins = 1 - proteins / (3000 + proteins)
 
     const bacteria = this.bacteria.length
-    this.pBacteria = 1 - 1 / (1 + Math.pow(2, -bacteria / 3))
+    this.pBacteria = 1 - 1 / (1 + Math.pow(2, -bacteria))
   }
   addBacterium(): BacteriumEntity {
     const bacterium = new BacteriumEntity(
