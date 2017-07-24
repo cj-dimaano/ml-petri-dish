@@ -136,7 +136,7 @@ export class SensorComponent extends GameComponent {
   constructor(host: GameEntity) {
     super(GameComponentKinds.Sensor, host)
   }
-  detected: Set<GameEntity> = new Set<GameEntity>()
+  detected: GameEntity[] = []
 }
 
 /**
