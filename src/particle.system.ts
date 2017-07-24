@@ -12,10 +12,12 @@ import { GameEntity } from "./game-entity"
 import { GameComponentKinds, ParticleComponent } from "./components"
 
 export class ParticleSystem extends GameComponentSystem {
-  constructor(
-    public readonly screenHeight: number,
-    public readonly screenWidth: number
-  ) { super(GameComponentKinds.Particle) }
+  constructor() {
+    super(GameComponentKinds.Particle)
+  }
+
+  public screenHeight: number
+  public screenWidth: number
 
   update(dt: number): void {
     const fnReflect = (

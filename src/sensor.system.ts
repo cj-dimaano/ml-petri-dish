@@ -18,9 +18,10 @@ import {
 import { GameEntity } from "./game-entity";
 
 export class SensorSystem extends GameComponentSystem {
-  constructor(private readonly signalSystem: SignalSystem) {
+  constructor() {
     super(GameComponentKinds.Sensor)
   }
+  public signalSystem: SignalSystem
   protected createComponent(host: GameEntity): SensorComponent {
     return new SensorComponent(host)
   }
