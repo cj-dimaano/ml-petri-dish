@@ -28,7 +28,7 @@ export class BubbleEntity extends GameEntity {
     decaySystem.attachComponent(this)
     const signal = <SignalComponent>signalSystem.attachComponent(this)
     signal.signature = 1 / 2
-    signal.radius = 30
+    signal.radius = 100
     particle.radius = 2
     particle.padding = 1
   }

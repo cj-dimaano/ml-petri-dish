@@ -47,10 +47,11 @@ export class BacteriumEntity extends GameEntity {
     energy.fuel = 5
     signal.signature = 1 / 4
     signal.radius = 30
-    decay.durability *= 8
+    decay.durability *= 2
     particle.velocity[0] = 1 - 2 * Math.random()
     particle.velocity[1] = 1 - 2 * Math.random()
     particle.angularVelocity = 0.01 - 0.02 * Math.random()
+    particle.angle = Math.random() * 2 * PIx2
     particle.radius = 5
     particle.padding = 3
   }

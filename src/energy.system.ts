@@ -24,7 +24,7 @@ export class EnergySystem extends GameComponentSystem {
 
   update(dt: number): void {
     // Get the delta time in seconds.
-    const sec = dt / 10
+    const sec = dt / 1000
 
     // Update each component.
     this.components.forEach(
@@ -46,7 +46,7 @@ export class EnergySystem extends GameComponentSystem {
 
         // Apply linear acceleration.
         accel = energy.fuel < accel ? energy.fuel : accel
-        MathEx._scale(u, accel)
+        MathEx._scale(u, accel * 100)
         energy.fuel -= accel
         MathEx._translate(particle.velocity, u)
 
@@ -64,7 +64,7 @@ export class EnergySystem extends GameComponentSystem {
         if (mag > 30)
           MathEx._scale(particle.velocity, 30 / mag)
         particle.angularVelocity
-          = Math.min(particle.angularVelocity, Math.PI / 6)
+          = Math.min(particle.angularVelocity, Math.PI / 90)
       }
     )
   }
