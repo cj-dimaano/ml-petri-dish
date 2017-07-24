@@ -34,7 +34,7 @@ export class QState {
   constructor(
     energy: EnergyComponent,
     particle: ParticleComponent,
-    detected: Set<GameEntity>
+    detected: GameEntity[]
   ) {
     this.features.push(
       Math.round(energy.fuel),
