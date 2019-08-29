@@ -2,9 +2,9 @@
   "name": "ml-petri-dish",
   "version": "0.0.0",
   "description": "Machine learning example of a simple petri dish simulation.",
-  "main": "index.js",
   "scripts": {
-    "webpack": "webpack --colors --display-error-details"
+    "webpack": "webpack --colors --display-error-details",
+    "build": "npm run webpack"
   },
   "author": "CJ Dimaano",
   "license": "ISC",

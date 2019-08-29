@@ -5,23 +5,25 @@
 @author CJ Dimaano
   <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
+const path = require("path");
 
 module.exports = {
   entry: {
-    index: "./src/index"
+    index: "./src/index.ts"
   },
-  output: {
-    filename: "index.js"
-  },
-  node: {
-    __dirname: false
+  devtool: "inline-source-map",
+  module: {
+    rules: [{
+      test: /\.tsx?$/,
+      use: "ts-loader",
+      exclude: /node_modules/
+    }]
   },
   resolve: {
-    extensions: [".ts", ".js"]
+    extensions: [".tsx", ".ts", ".js"]
   },
-  module: {
-    loaders: [
-      { test: /\.ts$/, loader: "ts-loader" }
-    ]
+  output: {
+    filename: "index.js",
+    path: path.resolve(__dirname, "dist")
   }
-}
+};
