@@ -1,8 +1,5 @@
 /*******************************************************************************
-@file `index.ts`
-  Created July 17, 2017
-
-@author CJ Dimaano
-  <c.j.s.dimaano@gmail.com>
+@file index.ts
+@author CJ Dimaano <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
