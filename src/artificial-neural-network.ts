@@ -55,9 +55,11 @@ export default class ArtificialNeuralNetwork {
     const weights = this.weights;
     const weightsCopy = this.copyWeights();
     const gradient: number[][] = Array(net.length);
+    t.unshift(1);
 
     console.assert(net.length === weightsCopy.length + 1);
 
+    /* https://en.wikipedia.org/wiki/Backpropagation#Derivation_for_a_single-layered_network */
     for (let l = weightsCopy.length; l > 0; l--) {
       const layer = net[l];
       gradient[l] = Array(layer.length);
@@ -69,13 +71,13 @@ export default class ArtificialNeuralNetwork {
           const next = gradient[l + 1];
           let sum = 0;
           // start at 1 to account for the bias
-          for (let o = 1; o < next.length; o++)
+          for (let o = 1; o < next.length; o++) {
+            // calculate the sum for intermediate node gradient
             sum += weightsCopy[l][o - 1][j] * next[o];
-          gradient[l][j] = sum * activationDerivitive;
-
-          // update weights
-          for (let o = 1; o < next.length; o++)
+            // update live weight
             weights[l][o - 1][j] -= this.learningRate * layer[j] * next[o];
+          }
+          gradient[l][j] = sum * activationDerivitive;
         }
       }
     }
@@ -90,6 +92,7 @@ export default class ArtificialNeuralNetwork {
       for (let w = 0; w < layer.length; w++) {
         layer[w] = [...this.weights[l][w]];
       }
+      copy[l] = layer;
     }
     return copy;
   }
@@ -104,6 +107,7 @@ export default class ArtificialNeuralNetwork {
       u[0] = 1;
       for (let w = 0; w < layer.length; w++)
         u[w + 1] = this.activate(v, layer[w]);
+      nodes[l + 1] = u;
     }
     return nodes;
   }
