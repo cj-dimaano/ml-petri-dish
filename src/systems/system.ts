@@ -1,24 +1,19 @@
 /*******************************************************************************
 @file system.ts
 @author CJ Dimaano <c.j.s.dimaano@gmail.com>
-@todo 
- - `components` member should have a size limit to prevent overflowing
- - need a better data structure for `components` to allow for removing elements
 *******************************************************************************/
 
-export default abstract class System<C> {
-    constructor(private componentType: new () => C) { }
-    components: C[] = [];
+import Entity from "../entities/entity";
+
+export default abstract class System {
+    entities: Set<Entity> = new Set<Entity>();
     /**
-     * @param dt The amount of time passed since the previous update in
-     *   franctions of a second.
+     * @param dt The amount of time passed since the previous update in seconds.
      */
     abstract update(dt: number): void;
-    addComponent(): C {
-        const component: C = new this.componentType();
-        this.components.push(component);
-        this.onComponentCreated(component);
-        return component;
+    addEntity(entity: Entity) {
+        this.entities.add(entity);
+        this.onEntityAdded(entity);
     }
-    protected onComponentCreated(component: C): void { }
+    protected onEntityAdded(entity: Entity) { }
 }

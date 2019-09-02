@@ -3,8 +3,11 @@
 @author CJ Dimaano <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
-export default class MobilityComponent {
-    constructor() { }
+import Component from "./component";
+
+export default class MobilityComponent extends Component {
+    constructor() { super(); }
+    static readonly kind = "mobility";
     position: number[] = [0, 0];
     velocity: number[] = [0, 0];
     acceleration: number = 0;

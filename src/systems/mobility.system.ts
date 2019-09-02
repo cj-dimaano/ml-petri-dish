@@ -6,6 +6,7 @@
 import System from "./system";
 import MobilityComponent from "../components/mobility.component";
 import * as LA from "../linear-algebra";
+import Entity from "../entities/entity";
 
 const DEG2RAD = Math.PI / 180;
 const MAX_VELOCITY = 45;
@@ -13,14 +14,15 @@ const MAX_ANGULAR_VELOCITY = 180 * DEG2RAD;
 const MIN_ANGULAR_VELOCITY = -180 * DEG2RAD;
 const FRICTION = 0.1;
 
-export default class MobilitySystem extends System<MobilityComponent> {
+export default class MobilitySystem extends System {
     constructor(canvas: HTMLCanvasElement) {
-        super(MobilityComponent);
+        super();
         this.bounds = [0, 0, canvas.width, canvas.height];
     }
     readonly bounds: [number, number, number, number];
     update(dt: number) {
-        this.components.forEach(component => {
+        this.entities.forEach(entity => {
+            const component = entity.get(MobilityComponent);
             // update angular velocity
             if (component.angularAcceleration === 0) {
                 component.angularVelocity -=
@@ -100,10 +102,11 @@ export default class MobilitySystem extends System<MobilityComponent> {
             * Math.random()
             + MIN_ANGULAR_VELOCITY;
     }
-    protected onComponentCreated(component: MobilityComponent) {
-        component.position = this.getRandomPoint();
-        component.velocity = this.getRandomVelocity();
-        component.angle = this.getRandomAngle();
-        component.angularVelocity = this.getRandomAngularVelocity();
+    protected onEntityAdded(entity: Entity) {
+        const mobility = entity.add(MobilityComponent);
+        mobility.position = this.getRandomPoint();
+        mobility.velocity = this.getRandomVelocity();
+        mobility.angle = this.getRandomAngle();
+        mobility.angularVelocity = this.getRandomAngularVelocity();
     }
 }

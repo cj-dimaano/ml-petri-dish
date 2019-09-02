@@ -5,11 +5,18 @@
 
 import MobilitySystem from "./systems/mobility.system";
 import AgentEntity from "./entities/agent.entity";
+import CollisionSystem from "./systems/collision.system";
+import MobilityComponent from "./components/mobility.component";
 
 export default class Game {
     constructor(private ctx: CanvasRenderingContext2D) {
         this.mobilitySystem = new MobilitySystem(ctx.canvas);
-        this.agentEntity = new AgentEntity(this.mobilitySystem);
+        this.collisionSystem = new CollisionSystem();
+
+        this.agentEntity = new AgentEntity(
+            this.mobilitySystem,
+            this.collisionSystem
+        );
         this.initInputHandlers();
     }
 
@@ -30,10 +37,12 @@ export default class Game {
     }
 
     private mobilitySystem: MobilitySystem;
+    private collisionSystem: CollisionSystem;
+
     private agentEntity: AgentEntity;
 
     private initInputHandlers() {
-        const agentMobility = this.agentEntity.mobilityComponent;
+        const agentMobility = this.agentEntity.get(MobilityComponent);
         window.addEventListener("keydown", (evt) => {
             switch (evt.key) {
                 case "ArrowLeft":
