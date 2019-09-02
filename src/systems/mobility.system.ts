@@ -24,28 +24,18 @@ export default class MobilitySystem extends System<MobilityComponent> {
             ), MAX_ANGULAR_VELOCITY);
 
             // apply angular velocity
-            component.position = LA.rotate(
-                component.position,
-                component.angularVelocity
-            );
+            component.angle = (component.angle + component.angularVelocity)
+                % LA.TAU;
 
             // update velocity
-            if (LA.magnitude(component.velocity) < MAX_VELOCITY) {
-                const acceleration = LA.scale(
-                    LA.normalize(component.position),
-                    component.acceleration
-                );
-                component.velocity = LA.add(component.velocity, acceleration);
-                if (LA.magnitude(component.velocity) > MAX_VELOCITY) {
-                    component.velocity = LA.scale(
-                        LA.normalize(component.velocity),
-                        MAX_VELOCITY
-                    );
-                }
-            }
+            component.velocity = Math.min(
+                component.velocity + component.acceleration,
+                MAX_VELOCITY
+            );
 
             // update position
-            component.position = LA.add(component.position, component.velocity);
+            const v = LA.rotate([0, component.velocity], component.angle);
+            component.position = LA.add(component.position, v);
             component.position[0] = Math.min(Math.max(
                 component.position[0],
                 this.bounds[0]
