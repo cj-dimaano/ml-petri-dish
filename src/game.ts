@@ -7,6 +7,7 @@ import MobilitySystem from "./systems/mobility.system";
 import AgentEntity from "./entities/agent.entity";
 import CollisionSystem from "./systems/collision.system";
 import MobilityComponent from "./components/mobility.component";
+import BubbleEntity from "./entities/bubble.entity";
 
 export default class Game {
     constructor(private ctx: CanvasRenderingContext2D) {
@@ -14,6 +15,10 @@ export default class Game {
         this.collisionSystem = new CollisionSystem();
 
         this.agentEntity = new AgentEntity(
+            this.mobilitySystem,
+            this.collisionSystem
+        );
+        this.bubbleEntity = new BubbleEntity(
             this.mobilitySystem,
             this.collisionSystem
         );
@@ -34,6 +39,7 @@ export default class Game {
     draw() {
         this.ctx.fillStyle = "white";
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        this.bubbleEntity.draw(this.ctx);
         this.agentEntity.draw(this.ctx);
     }
 
@@ -41,6 +47,7 @@ export default class Game {
     private collisionSystem: CollisionSystem;
 
     private agentEntity: AgentEntity;
+    private bubbleEntity: BubbleEntity;
 
     private initInputHandlers() {
         const agentMobility = this.agentEntity.get(MobilityComponent);
