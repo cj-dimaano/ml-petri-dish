@@ -3,6 +3,7 @@
 @author CJ Dimaano <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
+export const TAU = 2 * Math.PI;
 
 /**
  * @brief Calculates the dot product of two vectors.
