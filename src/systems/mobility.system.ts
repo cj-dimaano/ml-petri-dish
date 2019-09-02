@@ -8,9 +8,10 @@ import MobilityComponent from "../components/mobility.component";
 import * as LA from "../linear-algebra";
 
 const DEG2RAD = Math.PI / 180;
-const MAX_VELOCITY = 1;
-const MAX_ANGULAR_VELOCITY = 6 * DEG2RAD;
-const MIN_ANGULAR_VELOCITY = -6 * DEG2RAD;
+const MAX_VELOCITY = 45;
+const MAX_ANGULAR_VELOCITY = 180 * DEG2RAD;
+const MIN_ANGULAR_VELOCITY = -180 * DEG2RAD;
+const FRICTION = 0.1;
 
 export default class MobilitySystem extends System<MobilityComponent> {
     constructor(canvas: HTMLCanvasElement) {
@@ -21,31 +22,44 @@ export default class MobilitySystem extends System<MobilityComponent> {
     update(dt: number) {
         this.components.forEach(component => {
             // update angular velocity
-            component.angularVelocity = Math.min(Math.max(
-                component.angularVelocity
-                + component.angularAcceleration * dt * DEG2RAD * 10,
-                MIN_ANGULAR_VELOCITY
-            ), MAX_ANGULAR_VELOCITY);
+            if (component.angularAcceleration === 0) {
+                component.angularVelocity -=
+                    FRICTION * component.angularVelocity;
+            }
+            else {
+                component.angularVelocity = Math.min(Math.max(
+                    component.angularVelocity
+                    + component.angularAcceleration * DEG2RAD,
+                    MIN_ANGULAR_VELOCITY
+                ), MAX_ANGULAR_VELOCITY);
+            }
 
             // apply angular velocity
-            component.angle = (component.angle + component.angularVelocity)
+            component.angle = (component.angle + component.angularVelocity * dt)
                 % LA.TAU;
 
             // update velocity
-            const acceleration = LA.rotate(
-                [component.acceleration * dt * 2, 0],
-                component.angle
-            );
-            component.velocity = LA.add(component.velocity, acceleration);
-            if (LA.magnitude(component.velocity) > MAX_VELOCITY) {
-                component.velocity = LA.scale(
-                    LA.normalize(component.velocity),
-                    MAX_VELOCITY
+            if (component.acceleration === 0) {
+                component.velocity =
+                    LA.scale(component.velocity, 1.0 - FRICTION);
+            }
+            else {
+                const acceleration = LA.rotate(
+                    [component.acceleration, 0],
+                    component.angle
                 );
+                component.velocity = LA.add(component.velocity, acceleration);
+                if (LA.magnitude(component.velocity) > MAX_VELOCITY) {
+                    component.velocity = LA.scale(
+                        LA.normalize(component.velocity),
+                        MAX_VELOCITY
+                    );
+                }
             }
 
             // update position
-            component.position = LA.add(component.position, component.velocity);
+            const v = LA.scale(component.velocity, dt);
+            component.position = LA.add(component.position, v);
             if (component.position[0] < this.bounds[0]) {
                 component.position[0] = this.bounds[0];
                 component.velocity[0] = 0;
