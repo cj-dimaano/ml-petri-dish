@@ -26,6 +26,16 @@ export function normalize(v: number[]): number[] {
     return scale(v, 1 / magnitude(v));
 }
 
+export function add(v: number[], u: number[]): number[] {
+    console.assert(v.length === u.length);
+    return v.map((value, index) => value + u[index]);
+}
+
+export function subtract(v: number[], u: number[]): number[] {
+    console.assert(v.length === u.length);
+    return v.map((value, index) => value - u[index]);
+}
+
 /**
  * @brief Rotates a 2d vector.
  * @param v The 2d vector to be rotated.
