@@ -1,5 +1,5 @@
 /*******************************************************************************
-@file entity.ts
+@file component.ts
 @author CJ Dimaano <c.j.s.dimaano@gmail.com>
 @remarks The Component class is currently useless.
 *******************************************************************************/
