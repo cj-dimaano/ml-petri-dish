@@ -10,7 +10,6 @@ import * as LA from "../linear-algebra";
 export default class AgentEntity {
     constructor(mobilitySystem: MobilitySystem) {
         this.mobilityComponent = mobilitySystem.addComponent();
-        this.mobilityComponent.position = mobilitySystem.getRandomPoint();
     }
 
     mobilityComponent: MobilityComponent;

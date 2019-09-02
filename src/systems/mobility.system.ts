@@ -8,7 +8,7 @@ import MobilityComponent from "../components/mobility.component";
 import * as LA from "../linear-algebra";
 
 const DEG2RAD = Math.PI / 180;
-const MAX_VELOCITY = 5;
+const MAX_VELOCITY = 1;
 const MAX_ANGULAR_VELOCITY = 6 * DEG2RAD;
 const MIN_ANGULAR_VELOCITY = -6 * DEG2RAD;
 
@@ -19,7 +19,6 @@ export default class MobilitySystem extends System<MobilityComponent> {
     }
     readonly bounds: [number, number, number, number];
     update(dt: number) {
-        dt = dt / 1000.0;
         this.components.forEach(component => {
             // update angular velocity
             component.angularVelocity = Math.min(Math.max(
@@ -47,14 +46,20 @@ export default class MobilitySystem extends System<MobilityComponent> {
 
             // update position
             component.position = LA.add(component.position, component.velocity);
-            component.position[0] = Math.min(Math.max(
-                component.position[0],
-                this.bounds[0]
-            ), this.bounds[2]);
-            component.position[1] = Math.min(Math.max(
-                component.position[1],
-                this.bounds[1]
-            ), this.bounds[3]);
+            if (component.position[0] < this.bounds[0]) {
+                component.position[0] = this.bounds[0];
+                component.velocity[0] = 0;
+            } else if (component.position[0] > this.bounds[2]) {
+                component.position[0] = this.bounds[2];
+                component.velocity[0] = 0;
+            }
+            if (component.position[1] < this.bounds[1]) {
+                component.position[1] = this.bounds[1];
+                component.velocity[1] = 0;
+            } else if (component.position[1] > this.bounds[3]) {
+                component.position[1] = this.bounds[3];
+                component.velocity[1] = 0;
+            }
         });
     }
     getRandomPoint() {
@@ -66,5 +71,25 @@ export default class MobilitySystem extends System<MobilityComponent> {
             a + Math.random() * (c - a),
             b + Math.random() * (d - b)
         ];
+    }
+    getRandomVelocity() {
+        return LA.rotate(LA.scale(
+            LA.normalize([Math.random(), Math.random()]),
+            MAX_VELOCITY * Math.random()
+        ), this.getRandomAngle());
+    }
+    getRandomAngle() {
+        return LA.TAU * Math.random();
+    }
+    getRandomAngularVelocity() {
+        return (MAX_ANGULAR_VELOCITY - MIN_ANGULAR_VELOCITY)
+            * Math.random()
+            + MIN_ANGULAR_VELOCITY;
+    }
+    protected onComponentCreated(component: MobilityComponent) {
+        component.position = this.getRandomPoint();
+        component.velocity = this.getRandomVelocity();
+        component.angle = this.getRandomAngle();
+        component.angularVelocity = this.getRandomAngularVelocity();
     }
 }
