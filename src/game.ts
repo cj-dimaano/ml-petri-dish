@@ -28,6 +28,7 @@ export default class Game {
      */
     update(dt: number) {
         this.mobilitySystem.update(dt);
+        this.collisionSystem.update();
     }
 
     draw() {
