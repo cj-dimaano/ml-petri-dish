@@ -3,6 +3,8 @@
 @author CJ Dimaano <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 
+import { dot } from "./linear-algebra";
+
 export default class ArtificialNeuralNetwork {
   /**
    * @param inputCount The number of feature inputs.
@@ -137,16 +139,6 @@ export default class ArtificialNeuralNetwork {
     }
     return layer;
   }
-}
-
-/**
- * @brief Calculates the dot product of two vectors.
- * @param v The left vector.
- * @param u The right vector.
- */
-function dot(v: number[], u: number[]): number {
-  console.assert(v.length === u.length);
-  return v.reduce((prev, curr, index) => prev + curr * u[index]);
 }
 
 /**
