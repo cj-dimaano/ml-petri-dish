@@ -102,6 +102,9 @@ export default class MobilitySystem extends System {
             * Math.random()
             + MIN_ANGULAR_VELOCITY;
     }
+    spawn(entity: Entity) {
+        this.onEntityAdded(entity);
+    }
     protected onEntityAdded(entity: Entity) {
         const mobility = entity.add(MobilityComponent);
         mobility.position = this.getRandomPoint();
