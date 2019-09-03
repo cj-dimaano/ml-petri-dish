@@ -15,8 +15,12 @@ export default class ConsumerSystem extends System {
         this.entities.forEach(entity => {
             const collisions = entity.get(CollisionComponent).collisions;
             collisions.forEach(
-                collision => this.mobilitySystem.spawn(collision)
+                collision => {
+                    collision.get(CollisionComponent).collisions.delete(entity);
+                    this.mobilitySystem.spawn(collision);
+                }
             );
+            collisions.clear();
         });
     }
 }
