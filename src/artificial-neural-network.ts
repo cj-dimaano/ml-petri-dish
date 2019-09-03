@@ -57,6 +57,7 @@ export default class ArtificialNeuralNetwork {
     const weights = this.weights;
     const weightsCopy = this.copyWeights();
     const gradient: number[][] = Array(net.length);
+    // shift 1 to account for the computNodes output layer
     t.unshift(1);
 
     console.assert(net.length === weightsCopy.length + 1);
