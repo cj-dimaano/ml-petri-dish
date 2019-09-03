@@ -10,17 +10,24 @@ import CollisionSystem from "../systems/collision.system";
 import CollisionComponent from "../components/collision.component";
 import Entity from "./entity";
 import ConsumerSystem from "../systems/consumer.system";
+import TargetSystem from "../systems/target.system";
+import ArtificialIntelligenceSystem from "../systems/artificial-intelligence.system";
 
 export default class AgentEntity extends Entity {
     constructor(
         mobilitySystem: MobilitySystem,
         collisionSystem: CollisionSystem,
-        consumerSystem: ConsumerSystem
+        consumerSystem: ConsumerSystem,
+        targetSystem: TargetSystem,
+        aiSystem: ArtificialIntelligenceSystem
     ) {
-        super();
-        mobilitySystem.addEntity(this);
-        collisionSystem.addEntity(this);
-        consumerSystem.addEntity(this);
+        super(
+            mobilitySystem,
+            collisionSystem,
+            consumerSystem,
+            targetSystem,
+            aiSystem
+        );
         this.get(CollisionComponent).radius = 5;
     }
 

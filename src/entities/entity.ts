@@ -4,8 +4,12 @@
 *******************************************************************************/
 
 import Component from "../components/component";
+import System from "../systems/system";
 
 export default class Entity {
+    constructor(...systems: System[]) {
+        systems.forEach(system => system.addEntity(this));
+    }
     get<C extends Component>(component: new () => C): C {
         return this.components.get(component) as C;
     }

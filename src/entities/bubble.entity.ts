@@ -14,9 +14,7 @@ export default class BubbleEntity extends Entity {
         mobilitySystem: MobilitySystem,
         collisionSystem: CollisionSystem
     ) {
-        super();
-        mobilitySystem.addEntity(this);
-        collisionSystem.addEntity(this);
+        super(mobilitySystem, collisionSystem);
         this.get(CollisionComponent).radius = 1;
     }
 
