@@ -28,7 +28,7 @@ export default class CollisionSystem extends System {
                     aCollision.radius,
                     b.get(CollisionComponent).radius
                 );
-                if (LA.dot(w, w) > r * r) {
+                if (LA.dot(w, w) < r * r) {
                     aCollision.collisions.add(b);
                     bCollision.collisions.add(a);
                 }
