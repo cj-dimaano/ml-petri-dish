@@ -12,5 +12,5 @@ export default class TargetComponent extends Component {
      * @brief List of valid targets sorted by shortest distance.
      */
     targets: [Entity, number][] = [];
-    visionRadius: number = 50;
+    visionRadius: number = 100;
 }
