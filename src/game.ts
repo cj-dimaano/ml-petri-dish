@@ -8,15 +8,18 @@ import AgentEntity from "./entities/agent.entity";
 import CollisionSystem from "./systems/collision.system";
 import MobilityComponent from "./components/mobility.component";
 import BubbleEntity from "./entities/bubble.entity";
+import ConsumerSystem from "./systems/consumer.system";
 
 export default class Game {
     constructor(private ctx: CanvasRenderingContext2D) {
         this.mobilitySystem = new MobilitySystem(ctx.canvas);
         this.collisionSystem = new CollisionSystem();
+        this.consumerSystem = new ConsumerSystem(this.mobilitySystem);
 
         this.agentEntity = new AgentEntity(
             this.mobilitySystem,
-            this.collisionSystem
+            this.collisionSystem,
+            this.consumerSystem
         );
         this.bubbleEntity = new BubbleEntity(
             this.mobilitySystem,
@@ -34,6 +37,7 @@ export default class Game {
     update(dt: number) {
         this.mobilitySystem.update(dt);
         this.collisionSystem.update();
+        this.consumerSystem.update();
     }
 
     draw() {
@@ -45,6 +49,7 @@ export default class Game {
 
     private mobilitySystem: MobilitySystem;
     private collisionSystem: CollisionSystem;
+    private consumerSystem: ConsumerSystem;
 
     private agentEntity: AgentEntity;
     private bubbleEntity: BubbleEntity;

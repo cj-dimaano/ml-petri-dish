@@ -9,15 +9,18 @@ import * as LA from "../linear-algebra";
 import CollisionSystem from "../systems/collision.system";
 import CollisionComponent from "../components/collision.component";
 import Entity from "./entity";
+import ConsumerSystem from "../systems/consumer.system";
 
 export default class AgentEntity extends Entity {
     constructor(
         mobilitySystem: MobilitySystem,
-        collisionSystem: CollisionSystem
+        collisionSystem: CollisionSystem,
+        consumerSystem: ConsumerSystem
     ) {
         super();
         mobilitySystem.addEntity(this);
         collisionSystem.addEntity(this);
+        consumerSystem.addEntity(this);
         this.get(CollisionComponent).radius = 5;
     }
 
