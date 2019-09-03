@@ -9,8 +9,7 @@ import Component from "./component";
 import Entity from "../entities/entity";
 
 export default class CollisionComponent extends Component {
-    constructor() { super(); }
-    static readonly kind = "collision";
+    constructor() { super(CollisionComponent); }
     collisions: Set<Entity> = new Set<Entity>();
     /**
      * @remark All collisions are currently being treated as circular
