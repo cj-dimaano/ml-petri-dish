@@ -1,0 +1,113 @@
+/*******************************************************************************
+@file artificial-intelligence.system.ts
+@author CJ Dimaano <c.j.s.dimaano@gmail.com>
+*******************************************************************************/
+
+import System from "./system";
+import Entity from "../entities/entity";
+import ArtificialIntelligenceComponent
+    from "../components/artificial-intelligence.component";
+import MobilityComponent from "../components/mobility.component";
+import TargetComponent from "../components/target.component";
+import * as LA from "../linear-algebra";
+import CollisionComponent from "../components/collision.component";
+
+export default class ArtificialIntelligenceSystem extends System {
+    constructor() { super(); }
+    update(dt: number) {
+        this.entities.forEach(entity => {
+            const ai = entity.get(ArtificialIntelligenceComponent);
+            const mobility = entity.get(MobilityComponent);
+            mobility.acceleration = 0;
+            mobility.angularAcceleration = 0;
+            if (ai.awakeTimer > 0) {
+                if (entity.get(CollisionComponent).collisions.size > 0) {
+                    ai.awakeTimer = 0;
+                    ai.mem[ai.mem.length - 1][3] = 1;
+                }
+                else {
+                    ai.awakeTimer -= dt;
+                    const state = this.getEnvironmentState(entity);
+                    const outputs = ai.ann.generateOutputs(state);
+
+                    // choose an output via roulette algorithm
+                    const outputsSum = outputs.reduce((p, c) => p + c, 0);
+                    let roulette = Math.random() * outputsSum;
+                    const choice = outputs.findIndex(v => {
+                        roulette -= v;
+                        return roulette < 0;
+                    });
+                    console.assert(choice > -1 && choice < 6);
+
+                    // apply output choice
+                    switch (choice) {
+                        case 1:
+                            mobility.acceleration = 0;
+                            mobility.angularAcceleration = 10;
+                            break;
+
+                        case 2:
+                            mobility.acceleration = 0;
+                            mobility.angularAcceleration = -10;
+                            break;
+
+                        case 3:
+                            mobility.acceleration = 2;
+                            mobility.angularAcceleration = 0;
+                            break;
+
+                        case 4:
+                            mobility.acceleration = 2;
+                            mobility.angularAcceleration = 10;
+                            break;
+
+                        case 5:
+                            mobility.acceleration = 2;
+                            mobility.angularAcceleration = -10;
+                            break;
+                    }
+
+                    // update previous memory
+                    ai.mem[ai.mem.length - 1][3] =
+                        outputs[choice] * ai.rewardDecay;
+
+                    // save current memory
+                    ai.mem.push([state, outputs, choice, 0]);
+                }
+            } else if (ai.memIndex < ai.mem.length) {
+                const mem = ai.mem[ai.memIndex];
+                const x = mem[0];
+                const t = mem[1];
+                t[mem[2]] = mem[3];
+                ai.ann.updateWeights(x, t);
+                ai.memIndex++;
+            } else {
+                ai.memIndex = 0;
+                ai.mem.length = 0;
+                ai.awakeTimer
+                    = ArtificialIntelligenceComponent.AWAKE_TIME;
+                const state = this.getEnvironmentState(entity);
+                const outputs = ai.ann.generateOutputs(state);
+                ai.mem.push([state, outputs, 0, 0]);
+            }
+        });
+    }
+    getEnvironmentState(entity: Entity): number[] {
+        const mobility = entity.get(MobilityComponent);
+        const targets = entity.get(TargetComponent).targets;
+        const v = mobility.position;
+        const u = targets.length > 0
+            ? targets[0][0].get(MobilityComponent).position
+            : [0, 0];
+        return [
+            ...mobility.velocity,
+            mobility.acceleration,
+            mobility.angularVelocity,
+            mobility.angularAcceleration,
+            ...LA.rotate(LA.subtract(u, v), mobility.angle)
+        ];
+    }
+    protected onEntityAdded(entity: Entity) {
+        entity.add(ArtificialIntelligenceComponent);
+    }
+}
