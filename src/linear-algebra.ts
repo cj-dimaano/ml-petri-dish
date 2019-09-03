@@ -12,7 +12,11 @@ export const TAU = 2 * Math.PI;
  */
 export function dot(v: number[], u: number[]): number {
     console.assert(v.length === u.length);
-    return v.reduce((prev, curr, index) => prev + curr * u[index]);
+    let sum = 0;
+    for (let i = 0; i < v.length; i++)
+        sum += v[i] * u[i];
+    return sum;
+    // return v.reduce((prev, curr, index) => prev + curr * u[index]);
 }
 
 export function magnitude(v: number[]): number {
@@ -29,12 +33,20 @@ export function normalize(v: number[]): number[] {
 
 export function add(v: number[], u: number[]): number[] {
     console.assert(v.length === u.length);
-    return v.map((value, index) => value + u[index]);
+    let sum = Array(v.length).fill(0);
+    for (let i = 0; i < v.length; i++)
+        sum[i] = v[i] + u[i];
+    return sum;
+    // return v.map((value, index) => value + u[index]);
 }
 
 export function subtract(v: number[], u: number[]): number[] {
     console.assert(v.length === u.length);
-    return v.map((value, index) => value - u[index]);
+    let sum = Array(v.length).fill(0);
+    for (let i = 0; i < v.length; i++)
+        sum[i] = v[i] - u[i];
+    return sum;
+    // return v.map((value, index) => value - u[index]);
 }
 
 /**
