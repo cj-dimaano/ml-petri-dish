@@ -75,16 +75,13 @@ export default class ArtificialIntelligenceSystem extends System {
                     // save current memory
                     ai.mem.push([state, outputs, choice, 0]);
                 }
-            } else if (ai.memIndex < ai.mem.length) {
-                const mem = ai.mem[ai.memIndex];
+            } else if (ai.mem.length > 0) {
+                const mem = ai.mem.shift()!;
                 const x = mem[0];
                 const t = mem[1];
                 t[mem[2]] = mem[3];
                 ai.ann.updateWeights(x, t);
-                ai.memIndex++;
             } else {
-                ai.memIndex = 0;
-                ai.mem.length = 0;
                 ai.awakeTimer
                     = ArtificialIntelligenceComponent.AWAKE_TIME;
                 const state = this.getEnvironmentState(entity);

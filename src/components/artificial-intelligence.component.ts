@@ -32,11 +32,6 @@ export default class ArtificialIntelligenceComponent extends Component {
     mem: [number[], number[], number, number][] = [];
 
     /**
-     * @brief Used to keep track of which memory is being trained against.
-     */
-    memIndex: number = 0;
-
-    /**
      * @brief Number of seconds the agent will be awake.
      * @remarks If the agent fails to consume anything before the timer runs
      *   out, the agent will be forced to sleep in order to update ann weights.
