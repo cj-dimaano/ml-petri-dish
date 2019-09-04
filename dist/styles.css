@@ -11,8 +11,7 @@ canvas {
 }
 
 table {
-  width: 100%;
-  margin: 0;
+  margin: auto;
   padding: 0;
   border-collapse: collapse;
 }
