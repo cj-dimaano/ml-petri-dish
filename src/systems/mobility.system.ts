@@ -9,9 +9,9 @@ import * as LA from "../linear-algebra";
 import Entity from "../entities/entity";
 
 const DEG2RAD = Math.PI / 180;
-const MAX_VELOCITY = 45;
-const MAX_ANGULAR_VELOCITY = 180 * DEG2RAD;
-const MIN_ANGULAR_VELOCITY = -180 * DEG2RAD;
+const MAX_VELOCITY = 60;
+const MAX_ANGULAR_VELOCITY = 240 * DEG2RAD;
+const MIN_ANGULAR_VELOCITY = -240 * DEG2RAD;
 const FRICTION = 0.1;
 
 export default class MobilitySystem extends System {
