@@ -12,6 +12,7 @@ import ConsumerSystem from "./systems/consumer.system";
 import TargetSystem from "./systems/target.system";
 import ArtificialIntelligenceSystem from "./systems/artificial-intelligence.system";
 import ArtificialIntelligenceComponent from "./components/artificial-intelligence.component";
+import * as numeral from "numeral";
 
 export default class Game {
     constructor(private ctx: CanvasRenderingContext2D) {
@@ -34,8 +35,21 @@ export default class Game {
                 this.collisionSystem
             ));
         }
+
+        this.agentAi = this.agentEntity.get(ArtificialIntelligenceComponent);
         // this.initInputHandlers();
     }
+
+    tdChoices = [
+        document.getElementById("choice0")!,
+        document.getElementById("choice1")!,
+        document.getElementById("choice2")!,
+        document.getElementById("choice3")!,
+        document.getElementById("choice4")!,
+        document.getElementById("choice5")!
+    ];
+
+    agentAi: ArtificialIntelligenceComponent;
 
     get renderingContext() { return this.ctx; }
 
@@ -62,6 +76,15 @@ export default class Game {
             `${this.agentEntity.get(ArtificialIntelligenceComponent).score}`,
             10, 10
         );
+
+        const mem = this.agentAi.mem;
+        if (mem.length > 0) {
+            const choices = mem[mem.length - 1][1];
+            for (let i = 0; i < choices.length; i++) {
+                this.tdChoices[i].textContent
+                    = numeral(choices[i]).format("0.000");
+            }
+        }
     }
 
     private mobilitySystem: MobilitySystem;
