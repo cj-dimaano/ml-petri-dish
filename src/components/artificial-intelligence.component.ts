@@ -13,15 +13,15 @@ export default class ArtificialIntelligenceComponent extends Component {
 
     /**
      * @remarks
-     *   7 inputs include linear velocity, linear acceleration, angular
-     *   velocity, angular acceleration, and the position of a single target
-     *   with respect to the agent.
+     *   9 inputs include global position, velocity magnitude, angle, linear
+     *   acceleration, angular velocity, angular acceleration, and the position
+     *   of a single target with respect to the agent.
      * 
      *   6 outputs include confidence values for the total number of possible
      *   action combinations (2 possible linear actions, and 3 possible angular
      *   actions).
      */
-    ann: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(7, 6, [10, 10]);
+    ann: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(9, 6, [10, 10]);
 
     /**
      * @brief Episodic memory of environment states coupled with output values,
@@ -47,4 +47,9 @@ export default class ArtificialIntelligenceComponent extends Component {
      * @remarks Must be between 0 and 1.
      */
     rewardDecay: number = 0.95;
+
+    /**
+     * @brief The number of entities consumed.
+     */
+    score: number = 0;
 }

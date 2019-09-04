@@ -24,6 +24,7 @@ export default class ArtificialIntelligenceSystem extends System {
                 if (entity.get(CollisionComponent).collisions.size > 0) {
                     ai.awakeTimer = 0;
                     ai.mem[ai.mem.length - 1][3] = 1;
+                    ai.score++;
                 }
                 else {
                     ai.awakeTimer -= dt;
@@ -100,11 +101,13 @@ export default class ArtificialIntelligenceSystem extends System {
             ? targets[0][0].get(MobilityComponent).position
             : [0, 0];
         return [
-            ...mobility.velocity,
+            ...v,
+            LA.magnitude(mobility.velocity),
+            mobility.angle,
             mobility.acceleration,
             mobility.angularVelocity,
             mobility.angularAcceleration,
-            ...LA.rotate(LA.subtract(u, v), mobility.angle)
+            ...u
         ];
     }
     protected onEntityAdded(entity: Entity) {
