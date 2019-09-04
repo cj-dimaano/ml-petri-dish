@@ -11,6 +11,7 @@ import BubbleEntity from "./entities/bubble.entity";
 import ConsumerSystem from "./systems/consumer.system";
 import TargetSystem from "./systems/target.system";
 import ArtificialIntelligenceSystem from "./systems/artificial-intelligence.system";
+import ArtificialIntelligenceComponent from "./components/artificial-intelligence.component";
 
 export default class Game {
     constructor(private ctx: CanvasRenderingContext2D) {
@@ -27,10 +28,12 @@ export default class Game {
             this.targetSystem,
             this.aiSystem
         );
-        this.bubbleEntity = new BubbleEntity(
-            this.mobilitySystem,
-            this.collisionSystem
-        );
+        for (let i = 0; i < 30; i++) {
+            this.bubbleEntities.push(new BubbleEntity(
+                this.mobilitySystem,
+                this.collisionSystem
+            ));
+        }
         // this.initInputHandlers();
     }
 
@@ -51,8 +54,14 @@ export default class Game {
     draw() {
         this.ctx.fillStyle = "white";
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        this.bubbleEntity.draw(this.ctx);
+        this.bubbleEntities.forEach(bubble => bubble.draw(this.ctx));
         this.agentEntity.draw(this.ctx);
+
+        this.ctx.strokeStyle = "black";
+        this.ctx.strokeText(
+            `${this.agentEntity.get(ArtificialIntelligenceComponent).score}`,
+            10, 10
+        );
     }
 
     private mobilitySystem: MobilitySystem;
@@ -62,7 +71,7 @@ export default class Game {
     private aiSystem: ArtificialIntelligenceSystem;
 
     private agentEntity: AgentEntity;
-    private bubbleEntity: BubbleEntity;
+    private bubbleEntities: BubbleEntity[] = [];
 
     private initInputHandlers() {
         const agentMobility = this.agentEntity.get(MobilityComponent);
