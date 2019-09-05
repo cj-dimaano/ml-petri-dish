@@ -69,8 +69,16 @@ export default class ArtificialIntelligenceSystem extends System {
                     }
 
                     // update previous memory
-                    ai.mem[ai.mem.length - 1][3] =
-                        outputs[choice] * ai.rewardDecay;
+                    /* https://en.wikipedia.org/wiki/Q-learning#Algorithm */
+                    const learningRate = ai.ann.learningRate;
+                    const prevMem = ai.mem[ai.mem.length - 1];
+                    prevMem[3]
+                        = (1 - learningRate) * prevMem[1][prevMem[2]]
+                        + learningRate * (
+                            0 /* intermediate reward (could be distance) */
+                            + outputs.reduce((p, c) => Math.max(p, c), 0)
+                            * ai.rewardDecay
+                        );
 
                     // save current memory
                     ai.mem.push([state, outputs, choice, 0]);
