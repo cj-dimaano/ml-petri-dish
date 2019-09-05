@@ -3,16 +3,25 @@
   "version": "0.0.0",
   "description": "Machine learning example of a simple petri dish simulation.",
   "scripts": {
-    "webpack": "webpack --colors --display-error-details",
-    "build": "npm run webpack"
+    "webpack": "webpack --colors --display-error-details --mode=development",
+    "build": "npm run webpack",
+    "test": "mocha -r ts-node/register src/**/*.spec.ts"
   },
   "author": "CJ Dimaano",
   "license": "ISC",
   "dependencies": {},
   "devDependencies": {
-    "ts-loader": "^2.3.7",
-    "typescript": "^2.9.2",
-    "webpack": "^3.12.0",
+    "@types/chai": "^4.2.0",
+    "@types/mocha": "^5.2.7",
+    "@types/numeral": "0.0.26",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.0",
+    "moment": "^2.24.0",
+    "numeral": "^2.0.6",
+    "ts-loader": "^6.0.4",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.6.2",
+    "webpack": "^4.39.3",
     "webpack-cli": "^3.3.7"
   }
 }

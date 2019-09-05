@@ -9,3 +9,17 @@ div {
 canvas {
   border: 1px solid black;
 }
+
+table {
+  margin: auto;
+  padding: 0;
+  border-collapse: collapse;
+}
+
+td,
+th {
+  text-align: center;
+  border: 1pt solid black;
+  margin: 0;
+  box-sizing: border-box;
+}

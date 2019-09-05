@@ -8,12 +8,35 @@
     ML Petri Dish
   </title>
   <link rel="stylesheet" type="text/css" href="styles.css" />
-  <script type="text/javascript" src="./index.js"></script>
+  <script src="./index.js"></script>
 </head>
 
 <body>
   <div>
     <canvas id="canvas" height="300" width="400"></canvas>
+  </div>
+  <div id="duration"></div>
+  <div>
+    <table>
+      <tr>
+        <th></th>
+        <th>turn left</th>
+        <th>no turn</th>
+        <th>turn right</th>
+      </tr>
+      <tr>
+        <th>acceleration on</th>
+        <td id="choice4"></td>
+        <td id="choice3"></td>
+        <td id="choice5"></td>
+      </tr>
+      <tr>
+        <th>acceleration off</th>
+        <td id="choice1"></td>
+        <td id="choice0"></td>
+        <td id="choice2"></td>
+      </tr>
+    </table>
   </div>
 </body>
 
