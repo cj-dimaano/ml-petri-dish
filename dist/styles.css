@@ -14,6 +14,7 @@ table {
   margin: auto;
   padding: 0;
   border-collapse: collapse;
+  background-color: white;
 }
 
 td,
@@ -22,6 +23,11 @@ th {
   border: 1pt solid black;
   margin: 0;
   box-sizing: border-box;
+}
+
+td {
+  font-family: monospace;
+  font-size: x-small;
 }
 
 .destination {
@@ -38,4 +44,9 @@ th {
 
 table#grid td {
   padding: 5px;
+}
+
+td>div {
+  width: 1.4in;
+  text-align: left;
 }
