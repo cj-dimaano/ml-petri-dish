@@ -30,25 +30,64 @@ td {
   font-size: x-small;
 }
 
-.destination {
-  background-color: red;
-}
-
-.visited:not(.active) {
-  background-color: lightblue;
-}
-
-.visited.active {
-  background-color: blue;
+table#grid {
+  border: 1pt solid black;
+  border-collapse: separate;
 }
 
 table#grid td {
-  padding: 5px;
+  padding: 2px;
+}
+
+table#grid td.destination {
+  background-color: red;
+  border: 2px solid red;
+}
+
+table#grid td:not(.visited):not(.active):not(.destination) {
+  border: 2px solid white;
+}
+
+table#grid td.visited:not(.active) {
+  background-color: lightblue;
+  border: 2px solid white;
+  /* transition: all 0.1s ease-in; */
+}
+
+table#grid td.visited.active.north {
+  background-color: blue;
+  border-top: 2px solid magenta;
+  border-left: 2px solid blue;
+  border-bottom: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+table#grid td.visited.active.east {
+  background-color: blue;
+  border-top: 2px solid blue;
+  border-left: 2px solid magenta;
+  border-bottom: 2px solid blue;
+  border-right: 2px solid blue;
+}
+
+table#grid td.visited.active.south {
+  background-color: blue;
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-bottom: 2px solid magenta;
+  border-right: 2px solid blue;
+}
+
+.visited.active.west {
+  background-color: blue;
+  border-top: 2px solid blue;
+  border-left: 2px solid blue;
+  border-bottom: 2px solid blue;
+  border-right: 2px solid magenta;
 }
 
 td>div {
-  width: 1.4in;
-  text-align: left;
+  width: 1in;
 }
 
 progress {
