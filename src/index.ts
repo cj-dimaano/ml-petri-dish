@@ -55,14 +55,14 @@ import ANN from "./artificial-neural-network";
         for (let i = 0; i < Qa.length; i++) {
             // tdChoices[i].textContent
             //     = `${Qa[i]}, ${Qb[i]}`;
-            tdChoices[i].children[0].textContent = Qa[i];
-            tdChoices[i].children[1].textContent = Qb[i];
+            tdChoices[i].children[0].children[0].value = Qa[i];
+            tdChoices[i].children[1].children[0].value = Qb[i];
         }
     }
 
     function updateDuration(timespan: number) {
         // dom.get("duration")!.textContent = moment.duration(timespan).humanize();
-        dom.get("duration")!.textContent = numeral(-timespan/1000).format("00:00:00");
+        dom.get("duration")!.textContent = numeral(-timespan / 1000).format("00:00:00");
     }
 
     function getState(v: number[], u: number[], a: number) {
@@ -166,7 +166,7 @@ import ANN from "./artificial-neural-network";
                     const mChoiceA = Qa[m[1]];
                     const mChoiceB = Qb[m[1]];
 
-                    const discountFactor = 0.95;
+                    const discountFactor = 0.5;
 
                     Qa[m[1]]
                         = mChoiceA
@@ -211,9 +211,10 @@ import ANN from "./artificial-neural-network";
         }
 
 
-        let steps = 0;
+        let steps: number | undefined = undefined;
+        // let minSteps = MAX_DIM * MAX_DIM;
         function updateGame() {
-            steps++;
+            // steps++;
 
             // get Q predictions
             const state = getState(a, b, angle);
@@ -233,11 +234,15 @@ import ANN from "./artificial-neural-network";
             mem.push([state, choice, 0]);
 
             if (a[0] === b[0] && a[1] === b[1]) {
-                console.log(steps);
                 // @todo
                 // use `minSteps / steps` as reward val
-                mem.push([getState(a, b, angle), 0, 1]);
+                mem.push([getState(a, b, angle), 0, (steps === undefined ? mem.length : steps) / mem.length]);
+                steps = mem.length;
+                // mem.push([getState(a, b, angle), 0, minSteps / mem.length]);
+                console.log(mem.length);
+                // console.log(steps);
                 memBatch = 0;
+                // minSteps = Math.min(minSteps, mem.length);
                 setTimeout(() => {
                     updateDuration(start - performance.now());
                     updateWeights();
@@ -269,7 +274,7 @@ import ANN from "./artificial-neural-network";
             angle = 0;
             mem.length = 0;
             mem.push([getState(a, b, angle), 0, 0]);
-            steps = 0;
+            // steps = 0;
             episode++;
             dom.get("episode")!.textContent = numeral(episode).format("0,0");
 
