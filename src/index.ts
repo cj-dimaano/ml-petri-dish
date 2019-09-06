@@ -168,24 +168,26 @@ import ANN from "./artificial-neural-network";
 
                     const discountFactor = 0.5;
 
-                    Qa[m[1]]
+                    const QaUpdate
                         = mChoiceA
                         + Pa.learningRate
                         * (
                             r
                             + discountFactor
-                            * argMax(Pb.generateOutputs(nextState))
+                            * Qb[argMax(Pa.generateOutputs(nextState))]
                             - mChoiceA
                         );
-                    Qb[m[1]]
+                    const QbUpdate
                         = mChoiceB
                         + Pb.learningRate
                         * (
                             r
                             + discountFactor
-                            * argMax(Pa.generateOutputs(nextState))
+                            * Qa[argMax(Pb.generateOutputs(nextState))]
                             - mChoiceB
                         );
+                    Qa[m[1]] = QaUpdate;
+                    Qb[m[1]] = QbUpdate;
 
                     Pa.updateWeights(m[0], Qa);
                     Pb.updateWeights(m[0], Qb);
