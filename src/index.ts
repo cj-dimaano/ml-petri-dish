@@ -55,8 +55,8 @@ import ANN from "./artificial-neural-network";
         for (let i = 0; i < Qa.length; i++) {
             // tdChoices[i].textContent
             //     = `${Qa[i]}, ${Qb[i]}`;
-            tdChoices[i].children[0].children[0].value = Qa[i];
-            tdChoices[i].children[1].children[0].value = Qb[i];
+            tdChoices[i].children[0].textContent = Qa[i];
+            tdChoices[i].children[1].textContent = Qb[i];
         }
     }
 
@@ -102,11 +102,14 @@ import ANN from "./artificial-neural-network";
 
         function roulette(options: number[]): number {
             const sum = options.reduce((p, c) => p + c);
-            let roulette = Math.random() * sum;
-            return options.findIndex(v => {
-                roulette -= v;
-                return roulette <= 0;
-            });
+            if (sum > 0) {
+                let roulette = Math.random() * sum;
+                return options.findIndex(v => {
+                    roulette -= v;
+                    return roulette <= 0;
+                });
+            }
+            return options[Math.floor(Math.random() * options.length)];
         }
 
         function makeChoice(Qa: number[], Qb: number[]): number {
@@ -168,7 +171,7 @@ import ANN from "./artificial-neural-network";
                     const mChoiceA = Qa[m[1]];
                     const mChoiceB = Qb[m[1]];
 
-                    const discountFactor = 0.5;
+                    const discountFactor = 0.95;
 
                     const QaUpdate
                         = mChoiceA
@@ -215,7 +218,7 @@ import ANN from "./artificial-neural-network";
         }
 
 
-        let steps: number | undefined = undefined;
+        // let steps: number | undefined = undefined;
         // let minSteps = MAX_DIM * MAX_DIM;
         function updateGame() {
             // steps++;
@@ -240,9 +243,10 @@ import ANN from "./artificial-neural-network";
             if (a[0] === b[0] && a[1] === b[1]) {
                 // @todo
                 // use `minSteps / steps` as reward val
-                mem.push([getState(a, b, angle), 0, (steps === undefined ? mem.length : steps) / mem.length]);
-                steps = mem.length;
+                mem.push([getState(a, b, angle), 0, 1]);
                 // mem.push([getState(a, b, angle), 0, minSteps / mem.length]);
+                // mem.push([getState(a, b, angle), 0, (steps === undefined ? mem.length : steps) / mem.length]);
+                // steps = mem.length;
                 console.log(mem.length);
                 // console.log(steps);
                 memBatch = 0;
