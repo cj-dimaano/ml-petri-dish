@@ -50,3 +50,8 @@ td>div {
   width: 1.4in;
   text-align: left;
 }
+
+progress {
+  width: 100%;
+  margin: 0;
+}
