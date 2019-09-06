@@ -162,6 +162,8 @@ import ANN from "./artificial-neural-network";
 
                     const Qa = Pa.generateOutputs(m[0]);
                     const Qb = Pb.generateOutputs(m[0]);
+                    const QaNext = Pa.generateOutputs(nextState);
+                    const QbNext = Pb.generateOutputs(nextState);
 
                     const mChoiceA = Qa[m[1]];
                     const mChoiceB = Qb[m[1]];
@@ -174,7 +176,7 @@ import ANN from "./artificial-neural-network";
                         * (
                             r
                             + discountFactor
-                            * Qb[argMax(Pa.generateOutputs(nextState))]
+                            * QbNext[argMax(QaNext)]
                             - mChoiceA
                         );
                     const QbUpdate
@@ -183,7 +185,7 @@ import ANN from "./artificial-neural-network";
                         * (
                             r
                             + discountFactor
-                            * Qa[argMax(Pb.generateOutputs(nextState))]
+                            * QaNext[argMax(QbNext)]
                             - mChoiceB
                         );
                     Qa[m[1]] = QaUpdate;
