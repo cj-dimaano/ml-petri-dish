@@ -11,8 +11,8 @@ import * as LA from "./linear-algebra";
 import ANN from "./artificial-neural-network";
 
 (() => {
-    // [state, choice, reward]
-    type memory = [number[], number, number];
+    // [state, choice, reward, nextState]
+    type memory = [number[], number, number, number[]];
 
     const MAX_DIM = 30;
 
@@ -55,8 +55,8 @@ import ANN from "./artificial-neural-network";
         for (let i = 0; i < Qa.length; i++) {
             // tdChoices[i].textContent
             //     = `${Qa[i]}, ${Qb[i]}`;
-            tdChoices[i].children[0].textContent = Qa[i];
-            tdChoices[i].children[1].textContent = Qb[i];
+            tdChoices[i].children[0].textContent = numeral(Qa[i]).format("0.00000");
+            tdChoices[i].children[1].textContent = numeral(Qb[i]).format("0.00000");
         }
     }
 
@@ -92,8 +92,8 @@ import ANN from "./artificial-neural-network";
         // [state_t, action_t, reward_(t+1)]
         const mem: memory[] = [];
         // policy a and b
-        const Pa = new ANN(5, 6, [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
-        const Pb = new ANN(5, 6, [10, 10, 10, 10, 10, 10, 10, 10, 10, 10]);
+        const Pa = new ANN(5, 6, [30]);
+        const Pb = new ANN(5, 6, [30]);
 
 
         function argMax(options: number[]): number {
@@ -113,6 +113,7 @@ import ANN from "./artificial-neural-network";
         }
 
         function makeChoice(Qa: number[], Qb: number[]): number {
+            // @todo research choice selection techniques
             /*
             "clipped double-q"
             https://towardsdatascience.com/double-deep-q-networks-905dd8325412
@@ -120,7 +121,7 @@ import ANN from "./artificial-neural-network";
             let a = 0;
             let b = 0;
 
-            if (Math.random() < 10 / (10 + episode)) {
+            if (Math.random() < 100 / (100 + episode)) {
                 /* roulette */
                 a = roulette(Qa);
                 b = roulette(Qb);
@@ -139,15 +140,39 @@ import ANN from "./artificial-neural-network";
                 angle = (angle + 1 + 4) % 4;
 
             getCell(a).classList.toggle("active", false);
-            if (choice > 2) {
-                switch (angle) {
-                    case 0: a[1]--; break;
-                    case 1: a[0]--; break;
-                    case 2: a[1]++; break;
-                    case 3: a[0]++; break;
-                }
-                a[0] = clip(a[0], 0, MAX_DIM - 1);
-                a[1] = clip(a[1], 0, MAX_DIM - 1);
+            getCell(a).classList.toggle("north", false);
+            getCell(a).classList.toggle("east", false);
+            getCell(a).classList.toggle("south", false);
+            getCell(a).classList.toggle("west", false);
+            switch (angle) {
+                case 0:
+                    if (choice > 2) {
+                        a[1]--;
+                        a[1] = clip(a[1], 0, MAX_DIM - 1);
+                    }
+                    getCell(a).classList.toggle("east", true);
+                    break;
+                case 1:
+                    if (choice > 2) {
+                        a[0]--;
+                        a[0] = clip(a[0], 0, MAX_DIM - 1);
+                    }
+                    getCell(a).classList.toggle("north", true);
+                    break;
+                case 2:
+                    if (choice > 2) {
+                        a[1]++;
+                        a[1] = clip(a[1], 0, MAX_DIM - 1);
+                    }
+                    getCell(a).classList.toggle("west", true);
+                    break;
+                case 3:
+                    if (choice > 2) {
+                        a[0]++;
+                        a[0] = clip(a[0], 0, MAX_DIM - 1);
+                    }
+                    getCell(a).classList.toggle("south", true);
+                    break;
             }
             getCell(a).classList.add("visited", "active");
         }
@@ -157,11 +182,11 @@ import ANN from "./artificial-neural-network";
         let dream: memory[] = [];
         function updateWeights() {
             if (memBatch < 20) {
-                if (dream.length > 1) {
+                if (dream.length > 0) {
                     // https://en.wikipedia.org/wiki/Q-learning#Double_Q-learning
                     const m = dream.shift()!;
-                    const r = dream[0][2];
-                    const nextState = dream[0][0];
+                    const r = m[2];
+                    const nextState = m[3];
 
                     const Qa = Pa.generateOutputs(m[0]);
                     const Qb = Pb.generateOutputs(m[0]);
@@ -197,7 +222,7 @@ import ANN from "./artificial-neural-network";
                     Pa.updateWeights(m[0], Qa);
                     Pb.updateWeights(m[0], Qb);
                 } else {
-                    const batchSize = Math.max(mem.length * 0.05, 2);
+                    const batchSize = Math.max(mem.length * 0.05, 1);
                     const memStart = Math.floor(Math.random() * (mem.length - batchSize));
                     dream = mem.slice(memStart, memStart + batchSize);
                 }
@@ -222,13 +247,13 @@ import ANN from "./artificial-neural-network";
         // let minSteps = MAX_DIM * MAX_DIM;
         function updateGame() {
             // steps++;
+            const lastMem = mem[mem.length - 1];
 
             // get Q predictions
-            const state = getState(a, b, angle);
+            const state = lastMem[3];
             const Qa = Pa.generateOutputs(state);
             const Qb = Pb.generateOutputs(state);
 
-            // @todo research choice selection techniques
             const choice = makeChoice(Qa, Qb);
             // const choice = makeChoice(Qa);
             console.assert(choice >= 0 && choice < Qa.length);
@@ -237,13 +262,13 @@ import ANN from "./artificial-neural-network";
             // update angle
             updateState(choice);
 
-            // save memory
-            mem.push([state, choice, 0]);
+            // update memory
+            mem.push([state, choice, 0, getState(a, b, angle)]);
 
             if (a[0] === b[0] && a[1] === b[1]) {
                 // @todo
                 // use `minSteps / steps` as reward val
-                mem.push([getState(a, b, angle), 0, 1]);
+                mem[mem.length - 1][2] = 1;
                 // mem.push([getState(a, b, angle), 0, minSteps / mem.length]);
                 // mem.push([getState(a, b, angle), 0, (steps === undefined ? mem.length : steps) / mem.length]);
                 // steps = mem.length;
@@ -256,10 +281,18 @@ import ANN from "./artificial-neural-network";
                     updateWeights();
                 }, 0);
             }
-            else {
+            else if (mem.length < 10000) {
                 setTimeout(() => {
                     updateDuration(start - performance.now());
                     updateGame();
+                }, 0);
+            }
+            else {
+                console.log(mem.length);
+                memBatch = 0;
+                setTimeout(() => {
+                    updateDuration(start - performance.now());
+                    updateWeights();
                 }, 0);
             }
         }
@@ -281,7 +314,8 @@ import ANN from "./artificial-neural-network";
             // angle = Math.floor(Math.random() * 4); /* north, east, west, south */
             angle = 0;
             mem.length = 0;
-            mem.push([getState(a, b, angle), 0, 0]);
+            const state = getState(a, b, angle)
+            mem.push([state, 0, 0, state]);
             // steps = 0;
             episode++;
             dom.get("episode")!.textContent = numeral(episode).format("0,0");
