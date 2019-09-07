@@ -172,50 +172,53 @@ import ANN from "./artificial-neural-network";
     }
 
 
+    function updateWeights(m: memory) {
+        const r = m[2];
+        const nextState = m[3];
+
+        const Qa = Pa.generateOutputs(m[0]);
+        const Qb = Pb.generateOutputs(m[0]);
+        const QaNext = Pa.generateOutputs(nextState);
+        const QbNext = Pb.generateOutputs(nextState);
+
+        const mChoiceA = Qa[m[1]];
+        const mChoiceB = Qb[m[1]];
+
+        const QaUpdate
+            = mChoiceA
+            + Pa.learningRate
+            * (
+                r
+                + discountFactor
+                * QbNext[argMax(QaNext)]
+                - mChoiceA
+            );
+        const QbUpdate
+            = mChoiceB
+            + Pb.learningRate
+            * (
+                r
+                + discountFactor
+                * QaNext[argMax(QbNext)]
+                - mChoiceB
+            );
+        Qa[m[1]] = QaUpdate;
+        Qb[m[1]] = QbUpdate;
+
+        Pa.updateWeights(m[0], Qa);
+        Pb.updateWeights(m[0], Qb);
+    }
+
     let memBatch: number = 0;
     // [state_t, action_t, reward_(t+1)]
     const mem: memory[] = [];
     let dream: memory[] = [];
     let discountFactor = 0.95;
-    function updateWeights() {
+    function updateDream() {
         if (memBatch < 20) {
             if (dream.length > 0) {
                 // https://en.wikipedia.org/wiki/Q-learning#Double_Q-learning
-                const m = dream.shift()!;
-                const r = m[2];
-                const nextState = m[3];
-
-                const Qa = Pa.generateOutputs(m[0]);
-                const Qb = Pb.generateOutputs(m[0]);
-                const QaNext = Pa.generateOutputs(nextState);
-                const QbNext = Pb.generateOutputs(nextState);
-
-                const mChoiceA = Qa[m[1]];
-                const mChoiceB = Qb[m[1]];
-
-                const QaUpdate
-                    = mChoiceA
-                    + Pa.learningRate
-                    * (
-                        r
-                        + discountFactor
-                        * QbNext[argMax(QaNext)]
-                        - mChoiceA
-                    );
-                const QbUpdate
-                    = mChoiceB
-                    + Pb.learningRate
-                    * (
-                        r
-                        + discountFactor
-                        * QaNext[argMax(QbNext)]
-                        - mChoiceB
-                    );
-                Qa[m[1]] = QaUpdate;
-                Qb[m[1]] = QbUpdate;
-
-                Pa.updateWeights(m[0], Qa);
-                Pb.updateWeights(m[0], Qb);
+                updateWeights(dream.shift()!);
             } else {
                 const batchSize = Math.max(mem.length * 0.05, 1);
                 const memStart = Math.floor(Math.random() * (mem.length - batchSize));
@@ -224,7 +227,7 @@ import ANN from "./artificial-neural-network";
             }
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                updateWeights();
+                updateDream();
             }, 0);
         }
         else {
@@ -273,7 +276,7 @@ import ANN from "./artificial-neural-network";
             // minSteps = Math.min(minSteps, mem.length);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                updateWeights();
+                updateDream();
             }, 0);
         }
         else if (mem.length < 10000) {
@@ -287,7 +290,7 @@ import ANN from "./artificial-neural-network";
             memBatch = 0;
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                updateWeights();
+                updateDream();
             }, 0);
         }
     }
