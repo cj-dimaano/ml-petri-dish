@@ -12,14 +12,16 @@
 </head>
 
 <body>
+  <div id="duration"></div>
+  <div id="episode"></div>
   <!--div>
     <canvas id="canvas" height="300" width="400"></canvas>
   </div-->
-  <div id="duration"></div>
-  <div id="episode"></div>
   <div>
     <table id="grid"></table>
   </div>
+
+  <!-- outputs table -->
   <div>
     <table>
       <tr>
@@ -58,6 +60,23 @@
           <div></div>
         </td>
       </tr>
+    </table>
+  </div>
+
+  <div>
+    <table>
+      <tr>
+        <th colspan="2">Settings</th>
+      </tr>
+      <tr>
+        <td>Hidden layers</td>
+        <td><input id="hidden-layers" type="text"></td>
+      </tr>
+      <tr>
+        <td>Discount factor</td>
+        <td><input id="discount-factor" type="text"></td>
+      </tr>
+      <tr><td colspan="2"><button id="reset-button">Reset</button></td></tr>
     </table>
   </div>
 </body>

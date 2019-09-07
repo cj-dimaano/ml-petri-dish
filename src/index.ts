@@ -15,6 +15,8 @@ import ANN from "./artificial-neural-network";
     type memory = [number[], number, number, number[]];
 
     const MAX_DIM = 30;
+    let startTime: number = 0;
+
 
 
     const dom = new Map<string, HTMLElement>();
@@ -73,268 +75,281 @@ import ANN from "./artificial-neural-network";
         return Math.min(Math.max(val, min), max);
     }
 
+    /*
+    # double q-learning
+    https://en.wikipedia.org/wiki/Q-learning#Double_Q-learning
+    https://www.analyticsvidhya.com/blog/2019/04/introduction-deep-q-learning-python/
+    https://towardsdatascience.com/self-learning-ai-agents-part-ii-deep-q-learning-b5ac60c3f47
+    */
+    let angle = 0
+    let a: number[] = [];
+    let b: number[] = [];
+    // policy a and b
+    let hiddenLayers = [30]
+    let Pa = new ANN(5, 6, [...hiddenLayers]);
+    let Pb = new ANN(5, 6, [...hiddenLayers]);
 
-    window.addEventListener("load", () => {
-        saveDomElements("grid", "episode", "duration");
-        saveChoicesDomElements();
-        setupGrid(dom.get("grid")!);
 
+    function argMax(options: number[]): number {
+        return options.reduce((p, c, i, a) => a[p] < c ? i : p, 0);
+    }
 
+    function roulette(options: number[]): number {
+        const sum = options.reduce((p, c) => p + c);
+        if (sum > 0) {
+            let roulette = Math.random() * sum;
+            return options.findIndex(v => {
+                roulette -= v;
+                return roulette <= 0;
+            });
+        }
+        return options[Math.floor(Math.random() * options.length)];
+    }
+
+    function makeChoice(Qa: number[], Qb: number[]): number {
+        // @todo research choice selection techniques
         /*
-        # double q-learning
-        https://en.wikipedia.org/wiki/Q-learning#Double_Q-learning
-        https://www.analyticsvidhya.com/blog/2019/04/introduction-deep-q-learning-python/
-        https://towardsdatascience.com/self-learning-ai-agents-part-ii-deep-q-learning-b5ac60c3f47
+        "clipped double-q"
+        https://towardsdatascience.com/double-deep-q-networks-905dd8325412
         */
-        let angle = 0
-        let a: number[] = [];
-        let b: number[] = [];
-        // [state_t, action_t, reward_(t+1)]
-        const mem: memory[] = [];
-        // policy a and b
-        const Pa = new ANN(5, 6, [30]);
-        const Pb = new ANN(5, 6, [30]);
+        let a = 0;
+        let b = 0;
 
-
-        function argMax(options: number[]): number {
-            return options.reduce((p, c, i, a) => a[p] < c ? i : p, 0);
+        if (Math.random() < 10 / (10 + episode)) {
+            /* roulette */
+            a = roulette(Qa);
+            b = roulette(Qb);
+        } else {
+            /* greedy */
+            a = argMax(Qa);
+            b = argMax(Qb);
         }
+        return Qa[a] < Qb[b] ? a : b;
+    }
 
-        function roulette(options: number[]): number {
-            const sum = options.reduce((p, c) => p + c);
-            if (sum > 0) {
-                let roulette = Math.random() * sum;
-                return options.findIndex(v => {
-                    roulette -= v;
-                    return roulette <= 0;
-                });
-            }
-            return options[Math.floor(Math.random() * options.length)];
-        }
+    function updateState(choice: number) {
+        if (choice === 1 || choice === 4)
+            angle = (angle - 1 + 4) % 4;
+        else if (choice === 2 || choice === 5)
+            angle = (angle + 1 + 4) % 4;
 
-        function makeChoice(Qa: number[], Qb: number[]): number {
-            // @todo research choice selection techniques
-            /*
-            "clipped double-q"
-            https://towardsdatascience.com/double-deep-q-networks-905dd8325412
-            */
-            let a = 0;
-            let b = 0;
-
-            if (Math.random() < 100 / (100 + episode)) {
-                /* roulette */
-                a = roulette(Qa);
-                b = roulette(Qb);
-            } else {
-                /* greedy */
-                a = argMax(Qa);
-                b = argMax(Qb);
-            }
-            return Qa[a] < Qb[b] ? a : b;
-        }
-
-        function updateState(choice: number) {
-            if (choice === 1 || choice === 4)
-                angle = (angle - 1 + 4) % 4;
-            else if (choice === 2 || choice === 5)
-                angle = (angle + 1 + 4) % 4;
-
-            getCell(a).classList.toggle("active", false);
-            getCell(a).classList.toggle("north", false);
-            getCell(a).classList.toggle("east", false);
-            getCell(a).classList.toggle("south", false);
-            getCell(a).classList.toggle("west", false);
-            switch (angle) {
-                case 0:
-                    if (choice > 2) {
-                        a[1]--;
-                        a[1] = clip(a[1], 0, MAX_DIM - 1);
-                    }
-                    getCell(a).classList.toggle("east", true);
-                    break;
-                case 1:
-                    if (choice > 2) {
-                        a[0]--;
-                        a[0] = clip(a[0], 0, MAX_DIM - 1);
-                    }
-                    getCell(a).classList.toggle("north", true);
-                    break;
-                case 2:
-                    if (choice > 2) {
-                        a[1]++;
-                        a[1] = clip(a[1], 0, MAX_DIM - 1);
-                    }
-                    getCell(a).classList.toggle("west", true);
-                    break;
-                case 3:
-                    if (choice > 2) {
-                        a[0]++;
-                        a[0] = clip(a[0], 0, MAX_DIM - 1);
-                    }
-                    getCell(a).classList.toggle("south", true);
-                    break;
-            }
-            getCell(a).classList.add("visited", "active");
-        }
-
-
-        let memBatch: number = 0;
-        let dream: memory[] = [];
-        function updateWeights() {
-            if (memBatch < 20) {
-                if (dream.length > 0) {
-                    // https://en.wikipedia.org/wiki/Q-learning#Double_Q-learning
-                    const m = dream.shift()!;
-                    const r = m[2];
-                    const nextState = m[3];
-
-                    const Qa = Pa.generateOutputs(m[0]);
-                    const Qb = Pb.generateOutputs(m[0]);
-                    const QaNext = Pa.generateOutputs(nextState);
-                    const QbNext = Pb.generateOutputs(nextState);
-
-                    const mChoiceA = Qa[m[1]];
-                    const mChoiceB = Qb[m[1]];
-
-                    const discountFactor = 0.95;
-
-                    const QaUpdate
-                        = mChoiceA
-                        + Pa.learningRate
-                        * (
-                            r
-                            + discountFactor
-                            * QbNext[argMax(QaNext)]
-                            - mChoiceA
-                        );
-                    const QbUpdate
-                        = mChoiceB
-                        + Pb.learningRate
-                        * (
-                            r
-                            + discountFactor
-                            * QaNext[argMax(QbNext)]
-                            - mChoiceB
-                        );
-                    Qa[m[1]] = QaUpdate;
-                    Qb[m[1]] = QbUpdate;
-
-                    Pa.updateWeights(m[0], Qa);
-                    Pb.updateWeights(m[0], Qb);
-                } else {
-                    const batchSize = Math.max(mem.length * 0.05, 1);
-                    const memStart = Math.floor(Math.random() * (mem.length - batchSize));
-                    dream = mem.slice(memStart, memStart + batchSize);
-                    memBatch++;
+        getCell(a).classList.toggle("active", false);
+        getCell(a).classList.toggle("north", false);
+        getCell(a).classList.toggle("east", false);
+        getCell(a).classList.toggle("south", false);
+        getCell(a).classList.toggle("west", false);
+        switch (angle) {
+            case 0:
+                if (choice > 2) {
+                    a[1]--;
+                    a[1] = clip(a[1], 0, MAX_DIM - 1);
                 }
-                setTimeout(() => {
-                    updateDuration(start - performance.now());
-                    updateWeights();
-                }, 0);
-            }
-            else {
-                mem.length = 0;
-                dream.length = 0;
-                setTimeout(() => {
-                    updateDuration(start - performance.now());
-                    updateEpisode();
-                }, 0);
-            }
+                getCell(a).classList.toggle("east", true);
+                break;
+            case 1:
+                if (choice > 2) {
+                    a[0]--;
+                    a[0] = clip(a[0], 0, MAX_DIM - 1);
+                }
+                getCell(a).classList.toggle("north", true);
+                break;
+            case 2:
+                if (choice > 2) {
+                    a[1]++;
+                    a[1] = clip(a[1], 0, MAX_DIM - 1);
+                }
+                getCell(a).classList.toggle("west", true);
+                break;
+            case 3:
+                if (choice > 2) {
+                    a[0]++;
+                    a[0] = clip(a[0], 0, MAX_DIM - 1);
+                }
+                getCell(a).classList.toggle("south", true);
+                break;
         }
+        getCell(a).classList.add("visited", "active");
+    }
 
 
-        // let steps: number | undefined = undefined;
-        // let minSteps = MAX_DIM * MAX_DIM;
-        function updateGame() {
-            // steps++;
-            const lastMem = mem[mem.length - 1];
+    let memBatch: number = 0;
+    // [state_t, action_t, reward_(t+1)]
+    const mem: memory[] = [];
+    let dream: memory[] = [];
+    let discountFactor = 0.95;
+    function updateWeights() {
+        if (memBatch < 20) {
+            if (dream.length > 0) {
+                // https://en.wikipedia.org/wiki/Q-learning#Double_Q-learning
+                const m = dream.shift()!;
+                const r = m[2];
+                const nextState = m[3];
 
-            // get Q predictions
-            const state = lastMem[3];
-            const Qa = Pa.generateOutputs(state);
-            const Qb = Pb.generateOutputs(state);
+                const Qa = Pa.generateOutputs(m[0]);
+                const Qb = Pb.generateOutputs(m[0]);
+                const QaNext = Pa.generateOutputs(nextState);
+                const QbNext = Pb.generateOutputs(nextState);
 
-            const choice = makeChoice(Qa, Qb);
-            // const choice = makeChoice(Qa);
-            console.assert(choice >= 0 && choice < Qa.length);
-            updateTdChoices(Qa, Qb);
+                const mChoiceA = Qa[m[1]];
+                const mChoiceB = Qb[m[1]];
 
-            // update angle
-            updateState(choice);
+                const QaUpdate
+                    = mChoiceA
+                    + Pa.learningRate
+                    * (
+                        r
+                        + discountFactor
+                        * QbNext[argMax(QaNext)]
+                        - mChoiceA
+                    );
+                const QbUpdate
+                    = mChoiceB
+                    + Pb.learningRate
+                    * (
+                        r
+                        + discountFactor
+                        * QaNext[argMax(QbNext)]
+                        - mChoiceB
+                    );
+                Qa[m[1]] = QaUpdate;
+                Qb[m[1]] = QbUpdate;
 
-            // update memory
-            mem.push([state, choice, 0, getState(a, b, angle)]);
-
-            if (a[0] === b[0] && a[1] === b[1]) {
-                // @todo
-                // use `minSteps / steps` as reward val
-                mem[mem.length - 1][2] = 1;
-                // mem.push([getState(a, b, angle), 0, minSteps / mem.length]);
-                // mem.push([getState(a, b, angle), 0, (steps === undefined ? mem.length : steps) / mem.length]);
-                // steps = mem.length;
-                console.log(mem.length);
-                // console.log(steps);
-                memBatch = 0;
-                // minSteps = Math.min(minSteps, mem.length);
-                setTimeout(() => {
-                    updateDuration(start - performance.now());
-                    updateWeights();
-                }, 0);
+                Pa.updateWeights(m[0], Qa);
+                Pb.updateWeights(m[0], Qb);
+            } else {
+                const batchSize = Math.max(mem.length * 0.05, 1);
+                const memStart = Math.floor(Math.random() * (mem.length - batchSize));
+                dream = mem.slice(memStart, memStart + batchSize);
+                memBatch++;
             }
-            else if (mem.length < 10000) {
-                setTimeout(() => {
-                    updateDuration(start - performance.now());
-                    updateGame();
-                }, 0);
-            }
-            else {
-                console.log(mem.length);
-                memBatch = 0;
-                setTimeout(() => {
-                    updateDuration(start - performance.now());
-                    updateWeights();
-                }, 0);
-            }
+            timeout = setTimeout(() => {
+                updateDuration(startTime - performance.now());
+                updateWeights();
+            }, 0);
         }
-
-
-        let episode = 0;
-        function updateEpisode() {
-            clearGrid(dom.get("grid")!);
-            a = [
-                // Math.floor(Math.random() * MAX_DIM),
-                // Math.floor(Math.random() * MAX_DIM)
-                0, 0
-            ];
-            b = [
-                // Math.floor(Math.random() * MAX_DIM),
-                // Math.floor(Math.random() * MAX_DIM)
-                MAX_DIM - 1, MAX_DIM - 1
-            ];
-            // angle = Math.floor(Math.random() * 4); /* north, east, west, south */
-            angle = 0;
+        else {
             mem.length = 0;
-            const state = getState(a, b, angle)
-            mem.push([state, 0, 0, state]);
-            // steps = 0;
-            episode++;
-            dom.get("episode")!.textContent = numeral(episode).format("0,0");
+            dream.length = 0;
+            timeout = setTimeout(() => {
+                updateDuration(startTime - performance.now());
+                updateEpisode();
+            }, 0);
+        }
+    }
 
-            // if (episode < 1000) {
-            getCell(b).classList.add("destination");
-            getCell(a).classList.add("visited", "active");
-            setTimeout(() => {
-                updateDuration(start - performance.now());
+
+    // let steps: number | undefined = undefined;
+    // let minSteps = MAX_DIM * MAX_DIM;
+    function updateGame() {
+        // steps++;
+        const lastMem = mem[mem.length - 1];
+
+        // get Q predictions
+        const state = lastMem[3];
+        const Qa = Pa.generateOutputs(state);
+        const Qb = Pb.generateOutputs(state);
+
+        const choice = makeChoice(Qa, Qb);
+        // const choice = makeChoice(Qa);
+        console.assert(choice >= 0 && choice < Qa.length);
+        updateTdChoices(Qa, Qb);
+
+        // update angle
+        updateState(choice);
+
+        // update memory
+        mem.push([state, choice, 0, getState(a, b, angle)]);
+
+        if (a[0] === b[0] && a[1] === b[1]) {
+            // @todo
+            // use `minSteps / steps` as reward val
+            mem[mem.length - 1][2] = 1;
+            // mem.push([getState(a, b, angle), 0, minSteps / mem.length]);
+            // mem.push([getState(a, b, angle), 0, (steps === undefined ? mem.length : steps) / mem.length]);
+            // steps = mem.length;
+            console.log(mem.length);
+            // console.log(steps);
+            memBatch = 0;
+            // minSteps = Math.min(minSteps, mem.length);
+            timeout = setTimeout(() => {
+                updateDuration(startTime - performance.now());
+                updateWeights();
+            }, 0);
+        }
+        else if (mem.length < 10000) {
+            timeout = setTimeout(() => {
+                updateDuration(startTime - performance.now());
                 updateGame();
             }, 0);
-            // }
         }
+        else {
+            console.log(mem.length);
+            memBatch = 0;
+            timeout = setTimeout(() => {
+                updateDuration(startTime - performance.now());
+                updateWeights();
+            }, 0);
+        }
+    }
 
-        const start = performance.now();
-        setTimeout(() => {
-            updateDuration(start - performance.now());
+
+    let episode = 0;
+    function updateEpisode() {
+        clearGrid(dom.get("grid")!);
+        a = [
+            // Math.floor(Math.random() * MAX_DIM),
+            // Math.floor(Math.random() * MAX_DIM)
+            0, 0
+        ];
+        b = [
+            // Math.floor(Math.random() * MAX_DIM),
+            // Math.floor(Math.random() * MAX_DIM)
+            MAX_DIM - 1, MAX_DIM - 1
+        ];
+        // angle = Math.floor(Math.random() * 4); /* north, east, west, south */
+        angle = 0;
+        mem.length = 0;
+        const state = getState(a, b, angle)
+        mem.push([state, 0, 0, state]);
+        // steps = 0;
+        episode++;
+        dom.get("episode")!.textContent = numeral(episode).format("0,0");
+
+        // if (episode < 1000) {
+        getCell(b).classList.add("destination");
+        getCell(a).classList.add("visited", "active");
+        timeout = setTimeout(() => {
+            updateDuration(startTime - performance.now());
+            updateGame();
+        }, 0);
+        // }
+    }
+
+    let timeout: number;
+    function start() {
+        clearTimeout(timeout);
+        discountFactor = Number.parseFloat((dom.get("discount-factor") as HTMLInputElement).value);
+        hiddenLayers = JSON.parse((dom.get("hidden-layers") as HTMLInputElement).value);
+        Pa = new ANN(5, 6, [...hiddenLayers]);
+        Pb = new ANN(5, 6, [...hiddenLayers]);
+        episode = 0;
+        mem.length = 0;
+        console.clear();
+        startTime = performance.now();
+        timeout = setTimeout(() => {
+            updateDuration(startTime - performance.now());
             updateEpisode();
         }, 0);
+    }
+
+    window.addEventListener("load", () => {
+        saveDomElements("grid", "episode", "duration", "hidden-layers", "discount-factor", "reset-button");
+        saveChoicesDomElements();
+        setupGrid(dom.get("grid")!);
+        (dom.get("hidden-layers") as HTMLInputElement).value = JSON.stringify(hiddenLayers);
+        (dom.get("discount-factor") as HTMLInputElement).value = `${discountFactor}`;
+        dom.get("reset-button")!.addEventListener("click", start);
+        start();
     });
 })();
 

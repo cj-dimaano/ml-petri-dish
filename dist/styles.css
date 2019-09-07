@@ -6,6 +6,11 @@ div {
   text-align: center;
 }
 
+#duration,
+#episode {
+  font-family: monospace;
+}
+
 canvas {
   border: 1px solid black;
 }
