@@ -1,14 +1,10 @@
 body {
   background-color: lightgray;
+  font-family: monospace;
 }
 
 div {
   text-align: center;
-}
-
-#duration,
-#episode {
-  font-family: monospace;
 }
 
 canvas {
@@ -30,8 +26,11 @@ th {
   box-sizing: border-box;
 }
 
+th {
+  text-transform: uppercase;
+}
+
 td {
-  font-family: monospace;
   font-size: x-small;
 }
 
