@@ -115,7 +115,7 @@ import ANN from "./artificial-neural-network";
         let a = 0;
         let b = 0;
 
-        if (Math.random() < 10 / (10 + episode)) {
+        if (Math.random() < 10 / (10 + score)) {
             /* roulette */
             a = roulette(Qa);
             b = roulette(Qb);
@@ -264,6 +264,7 @@ import ANN from "./artificial-neural-network";
         mem.push([state, choice, 0, getState(a, b, angle)]);
 
         if (a[0] === b[0] && a[1] === b[1]) {
+            score++;
             // @todo
             // use `minSteps / steps` as reward val
             mem[mem.length - 1][2] = 1;
@@ -274,12 +275,15 @@ import ANN from "./artificial-neural-network";
             // console.log(steps);
             memBatch = 0;
             // minSteps = Math.min(minSteps, mem.length);
+            updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                updateDream();
+                // updateDream();
+                updateEpisode();
             }, 0);
         }
         else if (mem.length < 10000) {
+            updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
                 updateGame();
@@ -288,15 +292,18 @@ import ANN from "./artificial-neural-network";
         else {
             console.log(mem.length);
             memBatch = 0;
+            updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                updateDream();
+                // updateDream();
+                updateEpisode();
             }, 0);
         }
     }
 
 
     let episode = 0;
+    let score = 0;
     function updateEpisode() {
         clearGrid(dom.get("grid")!);
         a = [
@@ -316,7 +323,10 @@ import ANN from "./artificial-neural-network";
         mem.push([state, 0, 0, state]);
         // steps = 0;
         episode++;
-        dom.get("episode")!.textContent = numeral(episode).format("0,0");
+        dom.get("episode")!.textContent = `
+        ${numeral(episode).format("0,0")}
+        (${numeral(score).format("0,0")}; ${numeral(score / (Math.max(episode - 1, 1))).format("0.0%")})
+        `;
 
         // if (episode < 1000) {
         getCell(b).classList.add("destination");
@@ -336,6 +346,7 @@ import ANN from "./artificial-neural-network";
         Pa = new ANN(5, 6, [...hiddenLayers]);
         Pb = new ANN(5, 6, [...hiddenLayers]);
         episode = 0;
+        score = 0;
         mem.length = 0;
         console.clear();
         startTime = performance.now();
