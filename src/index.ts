@@ -225,8 +225,8 @@ import ANN from "./artificial-neural-network";
                     const batchSize = Math.max(mem.length * 0.05, 1);
                     const memStart = Math.floor(Math.random() * (mem.length - batchSize));
                     dream = mem.slice(memStart, memStart + batchSize);
+                    memBatch++;
                 }
-                memBatch++;
                 setTimeout(() => {
                     updateDuration(start - performance.now());
                     updateWeights();
