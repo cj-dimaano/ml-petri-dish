@@ -37,6 +37,7 @@ td {
 table#grid {
   border: 1pt solid black;
   border-collapse: separate;
+  border-spacing: 0;
 }
 
 table#grid td {
@@ -54,7 +55,7 @@ table#grid td:not(.visited):not(.active):not(.destination) {
 
 table#grid td.visited:not(.active) {
   background-color: lightblue;
-  border: 2px solid white;
+  border: 2px solid lightblue;
   /* transition: all 0.1s ease-in; */
 }
 
