@@ -14,7 +14,7 @@ import ANN from "./artificial-neural-network";
     // [state, choice, reward, nextState]
     type memory = [number[], number, number, number[]];
 
-    const MAX_DIM = 30;
+    const MAX_DIM = 15;
     let startTime: number = 0;
 
 
@@ -244,7 +244,6 @@ import ANN from "./artificial-neural-network";
     // let steps: number | undefined = undefined;
     // let minSteps = MAX_DIM * MAX_DIM;
     function updateGame() {
-        // steps++;
         const lastMem = mem[mem.length - 1];
 
         // get Q predictions
@@ -253,7 +252,6 @@ import ANN from "./artificial-neural-network";
         const Qb = Pb.generateOutputs(state);
 
         const choice = makeChoice(Qa, Qb);
-        // const choice = makeChoice(Qa);
         console.assert(choice >= 0 && choice < Qa.length);
         updateTdChoices(Qa, Qb);
 
@@ -266,24 +264,24 @@ import ANN from "./artificial-neural-network";
         if (a[0] === b[0] && a[1] === b[1]) {
             score++;
             // @todo
-            // use `minSteps / steps` as reward val
-            mem[mem.length - 1][2] = 1;
-            // mem.push([getState(a, b, angle), 0, minSteps / mem.length]);
-            // mem.push([getState(a, b, angle), 0, (steps === undefined ? mem.length : steps) / mem.length]);
-            // steps = mem.length;
+            // try `minSteps / steps` as reward val
+            const reward = 1;
+            // const reward = minSteps / mem.length;
+            // const reward = (steps === undefined ? mem.length : steps) / mem.length;
+            mem[mem.length - 1][2] = reward;
             console.log(mem.length);
-            // console.log(steps);
             memBatch = 0;
+            // steps = mem.length;
             // minSteps = Math.min(minSteps, mem.length);
-            updateWeights(mem[mem.length - 1]);
+            // updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                // updateDream();
-                updateEpisode();
+                updateDream();
+                // updateEpisode();
             }, 0);
         }
         else if (mem.length < 10000) {
-            updateWeights(mem[mem.length - 1]);
+            // updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
                 updateGame();
@@ -292,11 +290,11 @@ import ANN from "./artificial-neural-network";
         else {
             console.log(mem.length);
             memBatch = 0;
-            updateWeights(mem[mem.length - 1]);
+            // updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                // updateDream();
-                updateEpisode();
+                updateDream();
+                // updateEpisode();
             }, 0);
         }
     }
