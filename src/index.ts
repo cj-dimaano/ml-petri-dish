@@ -309,15 +309,15 @@ import ANN from "./artificial-neural-network";
         a = [
             // Math.floor(Math.random() * MAX_DIM),
             // Math.floor(Math.random() * MAX_DIM)
-            0, 0
+            MAX_DIM - 1, 0
         ];
         b = [
             // Math.floor(Math.random() * MAX_DIM),
             // Math.floor(Math.random() * MAX_DIM)
             MAX_DIM - 1, MAX_DIM - 1
         ];
-        // angle = Math.floor(Math.random() * 4); /* north, east, west, south */
-        angle = 0;
+        // angle = Math.floor(Math.random() * 4); /* east, north, west, south */
+        angle = 2;
         mem.length = 0;
         const state = getState(a, b, angle)
         mem.push([state, 0, 0, state]);
