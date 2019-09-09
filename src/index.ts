@@ -14,7 +14,8 @@ import ANN from "./artificial-neural-network";
     // [state, choice, reward, nextState]
     type memory = [number[], number, number, number[]];
 
-    const MAX_DIM = 15;
+    const MAX_DIM = 8;
+    const MAX_STEPS = MAX_DIM * MAX_DIM * 10;
     let startTime: number = 0;
 
 
@@ -68,6 +69,7 @@ import ANN from "./artificial-neural-network";
     }
 
     function getState(v: number[], u: number[], a: number) {
+        // @todo include step #
         return [...v, ...u, a];
     }
 
@@ -209,11 +211,12 @@ import ANN from "./artificial-neural-network";
         Pb.updateWeights(m[0], Qb);
     }
 
+    // @todo remember top 5 successes and choose to update from current memory and past successes
     let memBatch: number = 0;
     // [state_t, action_t, reward_(t+1)]
     const mem: memory[] = [];
     let dream: memory[] = [];
-    let discountFactor = 0.95;
+    let discountFactor = 1.0;
     function updateDream() {
         if (memBatch < 20) {
             if (dream.length > 0) {
@@ -273,28 +276,29 @@ import ANN from "./artificial-neural-network";
             memBatch = 0;
             // steps = mem.length;
             // minSteps = Math.min(minSteps, mem.length);
-            // updateWeights(mem[mem.length - 1]);
+            updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                updateDream();
-                // updateEpisode();
+                // updateDream();
+                updateEpisode();
             }, 0);
         }
-        else if (mem.length < 10000) {
-            // updateWeights(mem[mem.length - 1]);
+        else if (mem.length < MAX_STEPS) {
+            updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
                 updateGame();
             }, 0);
         }
         else {
+            // @todo set reward to 1 / (1 + distance^2)
             console.log(mem.length);
             memBatch = 0;
-            // updateWeights(mem[mem.length - 1]);
+            updateWeights(mem[mem.length - 1]);
             timeout = setTimeout(() => {
                 updateDuration(startTime - performance.now());
-                updateDream();
-                // updateEpisode();
+                // updateDream();
+                updateEpisode();
             }, 0);
         }
     }
