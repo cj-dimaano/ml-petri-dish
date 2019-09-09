@@ -173,6 +173,11 @@ import ANN from "./artificial-neural-network";
         getCell(a).classList.add("visited", "active");
     }
 
+    function softMax(v: number[]): number[] {
+        const sum = v.reduce((p, c) => p + c);
+        console.assert(sum > 0);
+        return LA.scale(v, 1.0 / sum);
+    }
 
     function updateWeights(m: memory) {
         const r = m[2];
@@ -207,8 +212,8 @@ import ANN from "./artificial-neural-network";
         Qa[m[1]] = QaUpdate;
         Qb[m[1]] = QbUpdate;
 
-        Pa.updateWeights(m[0], Qa);
-        Pb.updateWeights(m[0], Qb);
+        Pa.updateWeights(m[0], softMax(Qa));
+        Pb.updateWeights(m[0], softMax(Qb));
     }
 
     // @todo remember top 5 successes and choose to update from current memory and past successes
