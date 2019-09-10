@@ -14,88 +14,59 @@ import CollisionComponent from "../components/collision.component";
 
 export default class ArtificialIntelligenceSystem extends System {
     constructor() { super(); }
-    update(dt: number) {
+    update() {
         this.entities.forEach(entity => {
             const ai = entity.get(ArtificialIntelligenceComponent);
             const mobility = entity.get(MobilityComponent);
             mobility.acceleration = 0;
             mobility.angularAcceleration = 0;
-            if (ai.awakeTimer > 0) {
-                if (entity.get(CollisionComponent).collisions.size > 0) {
-                    ai.awakeTimer = 0;
-                    ai.mem[ai.mem.length - 1][3] = 1;
-                    ai.score++;
-                }
-                else {
-                    ai.awakeTimer -= dt;
-                    const state = this.getEnvironmentState(entity);
-                    const outputs = ai.ann.generateOutputs(state);
+            const state = this.getEnvironmentState(entity);
 
-                    // choose an output via roulette algorithm
-                    const outputsSum = outputs.reduce((p, c) => p + c, 0);
-                    let roulette = Math.random() * outputsSum;
-                    const choice = outputs.findIndex(v => {
-                        roulette -= v;
-                        return roulette < 0;
-                    });
-                    console.assert(choice > -1 && choice < 6);
-
-                    // apply output choice
-                    switch (choice) {
-                        case 1:
-                            mobility.acceleration = 0;
-                            mobility.angularAcceleration = 10;
-                            break;
-
-                        case 2:
-                            mobility.acceleration = 0;
-                            mobility.angularAcceleration = -10;
-                            break;
-
-                        case 3:
-                            mobility.acceleration = 2;
-                            mobility.angularAcceleration = 0;
-                            break;
-
-                        case 4:
-                            mobility.acceleration = 2;
-                            mobility.angularAcceleration = 10;
-                            break;
-
-                        case 5:
-                            mobility.acceleration = 2;
-                            mobility.angularAcceleration = -10;
-                            break;
-                    }
-
-                    // update previous memory
-                    /* https://en.wikipedia.org/wiki/Q-learning#Algorithm */
-                    const learningRate = ai.ann.learningRate;
-                    const prevMem = ai.mem[ai.mem.length - 1];
-                    prevMem[3]
-                        = (1 - learningRate) * prevMem[1][prevMem[2]]
-                        + learningRate * (
-                            0 /* intermediate reward (could be distance) */
-                            + outputs.reduce((p, c) => Math.max(p, c), 0)
-                            * ai.rewardDecay
-                        );
-
-                    // save current memory
-                    ai.mem.push([state, outputs, choice, 0]);
-                }
-            } else if (ai.mem.length > 0) {
-                const mem = ai.mem.shift()!;
-                const x = mem[0];
-                const t = mem[1];
-                t[mem[2]] = mem[3];
-                ai.ann.updateWeights(x, t);
-            } else {
-                ai.awakeTimer
-                    = ArtificialIntelligenceComponent.AWAKE_TIME;
-                const state = this.getEnvironmentState(entity);
-                const outputs = ai.ann.generateOutputs(state);
-                ai.mem.push([state, outputs, 0, 0]);
+            if (entity.get(CollisionComponent).collisions.size > 0) {
+                ai.mem[4] = entity.get(CollisionComponent).collisions.size;
+                ai.score++;
             }
+
+            // get Q predictions
+            const Qa = ai.Pa.generateOutputs(state);
+            const Qb = ai.Pb.generateOutputs(state);
+
+            const choice = makeChoice(Qa, Qb, ai.score);
+            console.assert(choice > -1 && choice < 6);
+
+            // apply output choice
+            switch (choice) {
+                case 1:
+                    mobility.acceleration = 0;
+                    mobility.angularAcceleration = 10;
+                    break;
+
+                case 2:
+                    mobility.acceleration = 0;
+                    mobility.angularAcceleration = -10;
+                    break;
+
+                case 3:
+                    mobility.acceleration = 2;
+                    mobility.angularAcceleration = 0;
+                    break;
+
+                case 4:
+                    mobility.acceleration = 2;
+                    mobility.angularAcceleration = 10;
+                    break;
+
+                case 5:
+                    mobility.acceleration = 2;
+                    mobility.angularAcceleration = -10;
+                    break;
+            }
+
+            // update weights for previous memory
+            updateWeights(ai, Qa, Qb);
+
+            // save current memory
+            ai.mem = [state, Qa, Qb, choice, 0];
         });
     }
     getEnvironmentState(entity: Entity): number[] {
@@ -118,4 +89,75 @@ export default class ArtificialIntelligenceSystem extends System {
     protected onEntityAdded(entity: Entity) {
         entity.add(ArtificialIntelligenceComponent);
     }
+}
+
+function roulette(options: number[]): number {
+    const sum = options.reduce((p, c) => p + c);
+    if (sum > 0) {
+        let rng = Math.random() * sum;
+        return options.findIndex(v => {
+            rng -= v;
+            return rng <= 0;
+        });
+    }
+    return options[Math.floor(Math.random() * options.length)];
+}
+
+function argMax(options: number[]): number {
+    return options.reduce((p, c, i, a) => a[p] < c ? i : p, 0);
+}
+
+function makeChoice(Qa: number[], Qb: number[], score: number): number {
+    const fn = Math.random() < 10 / (10 + score)
+        ? roulette
+        : argMax;
+
+    const a = fn(Qa);
+    const b = fn(Qb);
+
+    return Qa[a] < Qb[b] ? a : b;
+}
+
+function softMax(v: number[]): number[] {
+    const sum = v.reduce((p, c) => p + c);
+    return LA.scale(v, 1.0 / sum);
+}
+
+function updateWeights(
+    ai: ArtificialIntelligenceComponent,
+    QaNext: number[],
+    QbNext: number[]
+) {
+    const state = ai.mem[0];
+    const Qa = ai.mem[1];
+    const Qb = ai.mem[2];
+    const choice = ai.mem[3];
+    const r = ai.mem[4];
+
+    const mChoiceA = Qa[choice];
+    const mChoiceB = Qb[choice];
+
+    const QaUpdate
+        = mChoiceA
+        + ai.Pa.learningRate
+        * (
+            r
+            + ai.discountFactor
+            * QbNext[argMax(QaNext)]
+            - mChoiceA
+        );
+    const QbUpdate
+        = mChoiceB
+        + ai.Pb.learningRate
+        * (
+            r
+            + ai.discountFactor
+            * QaNext[argMax(QbNext)]
+            - mChoiceB
+        );
+    Qa[choice] = QaUpdate;
+    Qb[choice] = QbUpdate;
+
+    ai.Pa.updateWeights(state, softMax(Qa));
+    ai.Pb.updateWeights(state, softMax(Qb));
 }

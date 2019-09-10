@@ -30,6 +30,15 @@ export default class AgentEntity extends Entity {
             aiSystem
         );
         this.get(CollisionComponent).radius = 5;
+        const state = aiSystem.getEnvironmentState(this);
+        const ai = this.get(ArtificialIntelligenceComponent);
+        ai.mem = [
+            state,
+            ai.Pa.generateOutputs(state),
+            ai.Pb.generateOutputs(state),
+            0,
+            0
+        ];
     }
 
     draw(g: CanvasRenderingContext2D) {
@@ -37,12 +46,7 @@ export default class AgentEntity extends Entity {
         const a = this.get(MobilityComponent).angle;
         const p = this.get(MobilityComponent).position;
         const v = LA.rotate([3, 0], a);
-        const vr = this.get(ArtificialIntelligenceComponent).awakeTimer > 0
-            ? 15
-            : 0;
 
-        g.shadowBlur = vr;
-        g.shadowColor = "gray";
         g.fillStyle = "white";
         g.strokeStyle = "black";
         g.beginPath();
@@ -50,7 +54,6 @@ export default class AgentEntity extends Entity {
         g.fill();
         g.stroke();
 
-        g.shadowBlur = 0;
         g.beginPath();
         g.arc(p[0] + v[0], p[1] + v[1], 1, 0, 2 * Math.PI);
         g.stroke();
