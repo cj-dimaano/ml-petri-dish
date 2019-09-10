@@ -75,16 +75,8 @@ export default class ArtificialIntelligenceSystem extends System {
         const v = mobility.position;
         const u = targets.length > 0
             ? targets[0][0].get(MobilityComponent).position
-            : [0, 0];
-        return [
-            ...v,
-            LA.magnitude(mobility.velocity),
-            mobility.angle,
-            mobility.acceleration,
-            mobility.angularVelocity,
-            mobility.angularAcceleration,
-            ...u
-        ];
+            : v;
+        return [...LA.rotate(LA.subtract(u, v), -mobility.angle)];
     }
     protected onEntityAdded(entity: Entity) {
         entity.add(ArtificialIntelligenceComponent);

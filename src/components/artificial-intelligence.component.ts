@@ -11,16 +11,14 @@ export default class ArtificialIntelligenceComponent extends Component {
 
     /**
      * @remarks
-     *   9 inputs include global position, velocity magnitude, angle, linear
-     *   acceleration, angular velocity, angular acceleration, and the global 
-     *   position of a single target.
+     *   2 inputs include position of a single target with respect to the agent.
      * 
      *   6 outputs include confidence values for the total number of possible
      *   action combinations (2 possible linear actions, and 3 possible angular
      *   actions).
      */
-    Pa: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(9, 6, [20, 20]);
-    Pb: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(9, 6, [20, 20]);
+    Pa: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(2, 6, [16, 16]);
+    Pb: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(2, 6, [16, 16]);
 
     /**
      * @remarks
