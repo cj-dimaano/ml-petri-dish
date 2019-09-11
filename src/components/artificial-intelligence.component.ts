@@ -17,8 +17,8 @@ export default class ArtificialIntelligenceComponent extends Component {
      *   action combinations (2 possible linear actions, and 3 possible angular
      *   actions).
      */
-    Pa: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(2, 6, [16, 16]);
-    Pb: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(2, 6, [16, 16]);
+    Pa: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(2, 6, [16, 16, 16, 16]);
+    Pb: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(2, 6, [16, 16, 16, 16]);
 
     /**
      * @remarks
@@ -35,4 +35,11 @@ export default class ArtificialIntelligenceComponent extends Component {
      * @brief The number of entities consumed.
      */
     score: number = 0;
+
+    /**
+     * @brief Time between each sample.
+     */
+    sampleSpeed: number = 1.0 / 5.0;
+
+    sampleTick: number = 0;
 }

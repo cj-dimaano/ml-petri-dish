@@ -51,7 +51,7 @@ export default class Game {
         this.mobilitySystem.update(dt);
         this.targetSystem.update();
         this.collisionSystem.update();
-        this.aiSystem.update();
+        this.aiSystem.update(dt);
         this.consumerSystem.update();
     }
 
@@ -62,10 +62,7 @@ export default class Game {
         this.agentEntity.draw(this.ctx);
 
         this.ctx.strokeStyle = "black";
-        this.ctx.strokeText(
-            `${this.agentEntity.get(ArtificialIntelligenceComponent).score}`,
-            10, 10
-        );
+        this.ctx.strokeText(`${this.agentAi.score}`, 10, 10);
     }
 
     private mobilitySystem: MobilitySystem;

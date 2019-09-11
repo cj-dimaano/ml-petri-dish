@@ -14,27 +14,35 @@ import CollisionComponent from "../components/collision.component";
 
 export default class ArtificialIntelligenceSystem extends System {
     constructor() { super(); }
-    update() {
+    update(dt: number) {
         this.entities.forEach(entity => {
-            const ai = entity.get(ArtificialIntelligenceComponent);
-            const mobility = entity.get(MobilityComponent);
-            mobility.acceleration = 0;
-            mobility.angularAcceleration = 0;
             const state = this.getEnvironmentState(entity);
+            const ai = entity.get(ArtificialIntelligenceComponent);
 
+            // update score
             if (entity.get(CollisionComponent).collisions.size > 0) {
                 ai.mem[4] = entity.get(CollisionComponent).collisions.size;
                 ai.score++;
             }
+            else if (state[0] === 0 && state[1] === 0)
+                ai.mem[4] = -1;
+
+            // update sample tick
+            ai.sampleTick += dt;
+            if (ai.sampleTick < ai.sampleSpeed)
+                return;
+            ai.sampleTick -= ai.sampleSpeed;
 
             // get Q predictions
             const Qa = ai.Pa.generateOutputs(state);
             const Qb = ai.Pb.generateOutputs(state);
 
+            // apply output choice
             const choice = makeChoice(Qa, Qb, ai.score);
             console.assert(choice > -1 && choice < 6);
-
-            // apply output choice
+            const mobility = entity.get(MobilityComponent);
+            mobility.acceleration = 0;
+            mobility.angularAcceleration = 0;
             switch (choice) {
                 case 1:
                     mobility.acceleration = 0;
@@ -111,8 +119,9 @@ function makeChoice(Qa: number[], Qb: number[], score: number): number {
 }
 
 function softMax(v: number[]): number[] {
-    const sum = v.reduce((p, c) => p + c);
-    return LA.scale(v, 1.0 / sum);
+    const u = v.map(v => Math.exp(v));
+    const sum = u.reduce((p, c) => p + c);
+    return LA.scale(u, 1.0 / sum);
 }
 
 function updateWeights(
