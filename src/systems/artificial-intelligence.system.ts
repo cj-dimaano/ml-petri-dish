@@ -18,63 +18,80 @@ export default class ArtificialIntelligenceSystem extends System {
         this.entities.forEach(entity => {
             const state = this.getEnvironmentState(entity);
             const ai = entity.get(ArtificialIntelligenceComponent);
-
-            // update score
-            if (entity.get(CollisionComponent).collisions.size > 0) {
-                ai.mem[4] = entity.get(CollisionComponent).collisions.size;
-                ai.score++;
-            }
-            else if (state[0] === 0 && state[1] === 0)
-                ai.mem[4] = -1;
-
-            // update sample tick
-            ai.sampleTick += dt;
-            if (ai.sampleTick < ai.sampleSpeed)
-                return;
-            ai.sampleTick -= ai.sampleSpeed;
-
-            // get Q predictions
-            const Qa = ai.Pa.generateOutputs(state);
-            const Qb = ai.Pb.generateOutputs(state);
-
-            // apply output choice
-            const choice = makeChoice(Qa, Qb, ai.score);
-            console.assert(choice > -1 && choice < 6);
             const mobility = entity.get(MobilityComponent);
-            mobility.acceleration = 0;
-            mobility.angularAcceleration = 0;
-            switch (choice) {
-                case 1:
-                    mobility.acceleration = 0;
-                    mobility.angularAcceleration = 10;
-                    break;
 
-                case 2:
-                    mobility.acceleration = 0;
-                    mobility.angularAcceleration = -10;
-                    break;
+            if (ai.sleepTick > 0) {
+                ai.sleepTick -= dt;
 
-                case 3:
-                    mobility.acceleration = 2;
-                    mobility.angularAcceleration = 0;
-                    break;
+                const lastMem = ai.mem[ai.mem.length - 1];
+                lastMem[3] = state;
+                lastMem[2] -= dt;
 
-                case 4:
-                    mobility.acceleration = 2;
-                    mobility.angularAcceleration = 10;
-                    break;
+                // update score
+                const collisionCount = entity.get(CollisionComponent)
+                    .collisions.size;
+                if (collisionCount > 0) {
+                    lastMem[2] = collisionCount;
+                    ai.score += collisionCount;
+                    ai.sleepTick += collisionCount;
+                }
 
-                case 5:
-                    mobility.acceleration = 2;
-                    mobility.angularAcceleration = -10;
-                    break;
+                // update sample tick
+                ai.sampleTick += dt;
+                if (ai.sampleTick < ai.sampleTime)
+                    return;
+                ai.sampleTick -= ai.sampleTime;
+
+                // get Q predictions
+                const Qa = ai.Pa.generateOutputs(state);
+                const Qb = ai.Pb.generateOutputs(state);
+
+                // apply output choice
+                const choice = makeChoice(Qa, Qb, ai.score);
+                console.assert(choice > -1 && choice < 6);
+                mobility.acceleration = 0;
+                mobility.angularAcceleration = 0;
+                switch (choice) {
+                    case 1:
+                        mobility.acceleration = 0;
+                        mobility.angularAcceleration = 10;
+                        break;
+
+                    case 2:
+                        mobility.acceleration = 0;
+                        mobility.angularAcceleration = -10;
+                        break;
+
+                    case 3:
+                        mobility.acceleration = 2;
+                        mobility.angularAcceleration = 0;
+                        break;
+
+                    case 4:
+                        mobility.acceleration = 2;
+                        mobility.angularAcceleration = 10;
+                        break;
+
+                    case 5:
+                        mobility.acceleration = 2;
+                        mobility.angularAcceleration = -10;
+                        break;
+                }
+
+                // save current memory
+                ai.mem.push([state, choice, 0, []]);
+            } else if (ai.memCount < ai.mem.length) {
+                mobility.acceleration = 0;
+                mobility.angularAcceleration = 0;
+                ai.memCount++;
+                const mem = ai.mem[Math.floor(Math.random() * ai.mem.length)];
+                updateWeights(ai, ...mem);
+            } else {
+                ai.mem.length = 0;
+                ai.memCount = 0;
+                ai.mem.push([state, 0, 0, []]);
+                ai.sleepTick += ai.sleepTime;
             }
-
-            // update weights for previous memory
-            updateWeights(ai, Qa, Qb);
-
-            // save current memory
-            ai.mem = [state, Qa, Qb, choice, 0];
         });
     }
     getEnvironmentState(entity: Entity): number[] {
@@ -84,7 +101,10 @@ export default class ArtificialIntelligenceSystem extends System {
         const u = targets.length > 0
             ? targets[0][0].get(MobilityComponent).position
             : v;
-        return [...LA.rotate(LA.subtract(u, v), -mobility.angle)];
+        return [
+            ...LA.rotate(mobility.velocity, -mobility.angle),
+            ...LA.rotate(LA.subtract(u, v), -mobility.angle)
+        ];
     }
     protected onEntityAdded(entity: Entity) {
         entity.add(ArtificialIntelligenceComponent);
@@ -118,22 +138,32 @@ function makeChoice(Qa: number[], Qb: number[], score: number): number {
     return Qa[a] < Qb[b] ? a : b;
 }
 
+/**
+ * @brief Scales an array of numbers so that the total sum is 1.
+ * @param v Array of numbers to scale.
+ */
 function softMax(v: number[]): number[] {
-    const u = v.map(v => Math.exp(v));
+    const u = v.map(n => Math.exp(n));
     const sum = u.reduce((p, c) => p + c);
     return LA.scale(u, 1.0 / sum);
 }
 
 function updateWeights(
     ai: ArtificialIntelligenceComponent,
-    QaNext: number[],
-    QbNext: number[]
+    state: number[],
+    choice: number,
+    reward: number,
+    nextState: number[]
 ) {
-    const state = ai.mem[0];
-    const Qa = ai.mem[1];
-    const Qb = ai.mem[2];
-    const choice = ai.mem[3];
-    const r = ai.mem[4];
+    state.forEach(v => console.assert(!Number.isNaN(v)));
+    const Qa = ai.Pa.generateOutputs(state);
+    const Qb = ai.Pb.generateOutputs(state);
+    const QaNext = nextState.length > 0
+        ? ai.Pa.generateOutputs(nextState)
+        : Array(Qa.length).fill(0);
+    const QbNext = nextState.length > 0
+        ? ai.Pb.generateOutputs(nextState)
+        : Array(Qb.length).fill(0);
 
     const mChoiceA = Qa[choice];
     const mChoiceB = Qb[choice];
@@ -142,7 +172,7 @@ function updateWeights(
         = mChoiceA
         + ai.Pa.learningRate
         * (
-            r
+            reward
             + ai.discountFactor
             * QbNext[argMax(QaNext)]
             - mChoiceA
@@ -151,13 +181,13 @@ function updateWeights(
         = mChoiceB
         + ai.Pb.learningRate
         * (
-            r
+            reward
             + ai.discountFactor
             * QaNext[argMax(QbNext)]
             - mChoiceB
         );
-    Qa[choice] = QaUpdate;
-    Qb[choice] = QbUpdate;
+    Qa[choice] = Math.max(0, QaUpdate);
+    Qb[choice] = Math.max(0, QbUpdate);
 
     ai.Pa.updateWeights(state, softMax(Qa));
     ai.Pb.updateWeights(state, softMax(Qb));
