@@ -1,44 +1,56 @@
 # ML Petri Dish
 
-The purpose of this project is to demonstrate a very basic Artificial Neural Network with a
-simplified simulation of a petri dish with a few bacteria acting as the AI agents, bubbles of
-oxygen, and various food sources (proteins) for the bacteria.
+This project is primarily meant to be a personal exercise in learning various technologies.  The
+final product should be a simple simulation of at least one creature moving around collecting some
+kind of resource.  The creature(s) should be controlled by an AI that utilizes some technique of
+machine learning.
 
-# Build and Run
+## Build and Run
 
 [Webpack](https://webpack.github.io/) is needed to transpile the code which depends on
-[Node.JS](https://nodejs.org/).
+[NodeJS](https://nodejs.org/).
 
-Make sure you have Node.JS installed.
+Make sure you have NodeJS installed.
 
-```
+```bash
 $ node -v
-v8.1.4
+v8.*.*
 ```
 
-```
+```bash
 $ npm -v
-5.3.0
+6.*.*
 ```
-> If you do not have Node.JS installed, you can find it in the link above.
 
 While in the project root directory, install project dependencies.
 
-```
+```bash
 $ npm install
 ```
 
-Build the project with Webpack.
+Build the project.
 
 ```
-$ npm run webpack
+$ npm run build
 ```
 
-> Webpack will create a single `index.js` file in the project root directory.
-
-Open `index.html` in the project root directory to see the simulation.
+Open `./dist/index.html` to see the simulation.
 
 > Testing is exclusively performed on Google Chrome.
+
+## Tech/Libs/Topics
+
+* [VS Code](https://code.visualstudio.com/)
+* [Chrome](https://www.google.com/chrome/) Debug Tools
+* [NodeJS](https://nodejs.org/en/)
+* [Webpack](https://webpack.js.org/)
+* [Typescript](https://www.typescriptlang.org/)
+* [MochaJS](https://mochajs.org/)
+* [NumeralJS](http://numeraljs.com/)
+* [Deep Double-Q Learning](https://en.wikipedia.org/wiki/Q-learning#Double_Q-learning)
+* [Entity-Component-System](https://en.wikipedia.org/wiki/Entity_component_system) architecture
+* HTML5 [Canvas](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API)
+* CSS
 
 ---
 
