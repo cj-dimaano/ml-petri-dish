@@ -39,6 +39,11 @@ export default class ArtificialIntelligenceComponent extends Component {
     score: number = 0;
 
     /**
+     * @todo
+     *   Add wake count
+     */
+
+    /**
      * @brief Time between each sample.
      */
     sampleTime: number = 1.0 / 5.0;

@@ -4,7 +4,6 @@
 *******************************************************************************/
 
 import Game from "./game";
-import * as numeral from "numeral";
 
 (() => {
     window.addEventListener("load", () => {
