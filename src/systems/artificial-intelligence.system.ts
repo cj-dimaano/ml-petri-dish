@@ -51,7 +51,7 @@ export default class ArtificialIntelligenceSystem extends System {
             : v;
         return [
             ...LA.rotate(mobility.velocity, -mobility.angle),
-            ...LA.rotate(LA.subtract(u, v), -mobility.angle)
+            ...LA.rotate(LA.difference(u, v), -mobility.angle)
         ];
     }
     protected onEntityAdded(entity: Entity) {

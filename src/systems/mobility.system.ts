@@ -50,7 +50,7 @@ export default class MobilitySystem extends System {
                     [component.acceleration, 0],
                     component.angle
                 );
-                component.velocity = LA.add(component.velocity, acceleration);
+                component.velocity = LA.sum(component.velocity, acceleration);
                 if (LA.magnitude(component.velocity) > MAX_VELOCITY) {
                     component.velocity = LA.scale(
                         LA.normalize(component.velocity),
@@ -61,7 +61,7 @@ export default class MobilitySystem extends System {
 
             // update position
             const v = LA.scale(component.velocity, dt);
-            component.position = LA.add(component.position, v);
+            component.position = LA.sum(component.position, v);
             if (component.position[0] < this.bounds[0]) {
                 component.position[0] = this.bounds[0];
                 component.velocity[0] = 0;

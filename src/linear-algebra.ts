@@ -7,16 +7,10 @@ export const TAU = 2 * Math.PI;
 
 /**
  * @brief Calculates the dot product of two vectors.
- * @param v The left vector.
- * @param u The right vector.
  */
 export function dot(v: number[], u: number[]): number {
     console.assert(v.length === u.length);
-    let sum = 0;
-    for (let i = 0; i < v.length; i++)
-        sum += v[i] * u[i];
-    return sum;
-    // return v.reduce((prev, curr, index) => prev + curr * u[index]);
+    return v.reduce((p, _, i) => p + v[i] * u[i], 0);
 }
 
 export function magnitude(v: number[]): number {
@@ -28,25 +22,22 @@ export function scale(v: number[], s: number): number[] {
 }
 
 export function normalize(v: number[]): number[] {
-    return scale(v, 1 / magnitude(v));
+    const mag = magnitude(v);
+    return scale(v, 1 / (mag === 0 ? 1 : mag));
 }
 
-export function add(v: number[], u: number[]): number[] {
-    console.assert(v.length === u.length);
-    let sum = Array(v.length).fill(0);
-    for (let i = 0; i < v.length; i++)
-        sum[i] = v[i] + u[i];
-    return sum;
-    // return v.map((value, index) => value + u[index]);
+export function sum(v: number[], ...u: number[][]): number[] {
+    return u.reduce((p: number[], c: number[]) => {
+        console.assert(p.length === c.length);
+        return p.map((_, i) => p[i] + c[i]);
+    }, v);
 }
 
-export function subtract(v: number[], u: number[]): number[] {
-    console.assert(v.length === u.length);
-    let sum = Array(v.length).fill(0);
-    for (let i = 0; i < v.length; i++)
-        sum[i] = v[i] - u[i];
-    return sum;
-    // return v.map((value, index) => value - u[index]);
+export function difference(v: number[], ...u: number[][]): number[] {
+    return u.reduce((p: number[], c: number[]) => {
+        console.assert(p.length === c.length);
+        return p.map((_, i) => p[i] - c[i]);
+    }, v);
 }
 
 /**
@@ -58,7 +49,7 @@ export function rotate(v: number[], rad: number): number[] {
     console.assert(v.length === 2);
     const sin = Math.sin(rad);
     const cos = Math.cos(rad);
-    const a = v[0];
-    const b = v[1];
-    return [a * cos + b * sin, b * cos - a * sin];
+    const v0 = v[0];
+    const v1 = v[1];
+    return [v0 * cos + v1 * sin, v1 * cos - v0 * sin];
 }
