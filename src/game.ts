@@ -13,6 +13,9 @@ import TargetSystem from "./systems/target.system";
 import ArtificialIntelligenceSystem from "./systems/artificial-intelligence.system";
 import ArtificialIntelligenceComponent from "./components/artificial-intelligence.component";
 
+const BUBBLE_POPULATION = 30;
+export const FRAME_DT = 1000 / 60;
+
 export default class Game {
     constructor(private ctx: CanvasRenderingContext2D) {
         this.mobilitySystem = new MobilitySystem(ctx.canvas);
@@ -28,11 +31,11 @@ export default class Game {
             this.targetSystem,
             this.aiSystem
         );
-        for (let i = 0; i < 30; i++) {
-            this.bubbleEntities.push(new BubbleEntity(
+        for (let i = 0; i < this.bubbleEntities.length; ++i) {
+            this.bubbleEntities[i] = new BubbleEntity(
                 this.mobilitySystem,
                 this.collisionSystem
-            ));
+            );
         }
 
         this.agentAi = this.agentEntity.get(ArtificialIntelligenceComponent);
@@ -43,19 +46,37 @@ export default class Game {
 
     get renderingContext() { return this.ctx; }
 
+    run() {
+        let prevTick = performance.now();
+        const start = prevTick;
+        const nextFrame = (now: DOMHighResTimeStamp) => {
+            // Update duration
+            // durationElement.textContent = numeral((now - start) / 1000.0).format("00:00:00");
+
+            while (now - prevTick >= FRAME_DT) {
+                this.update();
+                prevTick += FRAME_DT;
+            }
+            this.draw();
+
+            requestAnimationFrame(nextFrame);
+        }
+        requestAnimationFrame(nextFrame);
+    }
+
     /**
-     * @param dt The amount of time passed since the previous update in
-     *   franctions of a second.
+     * @remarks
+     *   Game runs on a fixed frame rate to simplify updates
      */
-    update(dt: number) {
-        this.mobilitySystem.update(dt);
+    private update() {
+        this.mobilitySystem.update();
         this.targetSystem.update();
         this.collisionSystem.update();
-        this.aiSystem.update(dt);
+        this.aiSystem.update();
         this.consumerSystem.update();
     }
 
-    draw() {
+    private draw() {
         this.ctx.fillStyle = "white";
         this.ctx.fillRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
         this.bubbleEntities.forEach(bubble => bubble.draw(this.ctx));
@@ -72,7 +93,7 @@ export default class Game {
     private aiSystem: ArtificialIntelligenceSystem;
 
     private agentEntity: AgentEntity;
-    private bubbleEntities: BubbleEntity[] = [];
+    private bubbleEntities: BubbleEntity[] = Array<BubbleEntity>(BUBBLE_POPULATION);
 
     initInputHandlers() {
         const agentMobility = this.agentEntity.get(MobilityComponent);

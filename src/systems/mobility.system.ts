@@ -7,6 +7,7 @@ import System from "./system";
 import MobilityComponent from "../components/mobility.component";
 import * as LA from "../linear-algebra";
 import Entity from "../entities/entity";
+import { FRAME_DT } from "../game";
 
 const DEG2RAD = Math.PI / 180;
 const MAX_VELOCITY = 60;
@@ -20,7 +21,7 @@ export default class MobilitySystem extends System {
         this.bounds = [0, 0, canvas.width, canvas.height];
     }
     readonly bounds: [number, number, number, number];
-    update(dt: number) {
+    update() {
         this.entities.forEach(entity => {
             const component = entity.get(MobilityComponent);
             // update angular velocity
@@ -37,7 +38,7 @@ export default class MobilitySystem extends System {
             }
 
             // apply angular velocity
-            component.angle = (component.angle + component.angularVelocity * dt)
+            component.angle = (component.angle + component.angularVelocity * FRAME_DT)
                 % LA.TAU;
 
             // update velocity
@@ -60,7 +61,7 @@ export default class MobilitySystem extends System {
             }
 
             // update position
-            const v = LA.scale(component.velocity, dt);
+            const v = LA.scale(component.velocity, FRAME_DT);
             component.position = LA.sum(component.position, v);
             if (component.position[0] < this.bounds[0]) {
                 component.position[0] = this.bounds[0];

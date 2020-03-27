@@ -11,10 +11,11 @@ import MobilityComponent from "../components/mobility.component";
 import TargetComponent from "../components/target.component";
 import * as LA from "../linear-algebra";
 import CollisionComponent from "../components/collision.component";
+import { FRAME_DT } from "../game";
 
 export default class ArtificialIntelligenceSystem extends System {
     constructor() { super(); }
-    update(dt: number) {
+    update() {
         this.entities.forEach(entity => {
             const state = this.getEnvironmentState(entity);
             const ai = entity.get(ArtificialIntelligenceComponent);
@@ -22,7 +23,7 @@ export default class ArtificialIntelligenceSystem extends System {
 
             if (ai.sleepTick > 0) {
                 updateAction(
-                    dt,
+                    FRAME_DT,
                     ai,
                     mobility,
                     state,
