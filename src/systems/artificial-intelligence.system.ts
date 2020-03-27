@@ -11,7 +11,7 @@ import MobilityComponent from "../components/mobility.component";
 import TargetComponent from "../components/target.component";
 import * as LA from "../linear-algebra";
 import CollisionComponent from "../components/collision.component";
-import { FRAME_DT } from "../game";
+import { FRAME_DT_S } from "../game";
 
 export default class ArtificialIntelligenceSystem extends System {
     constructor() { super(); }
@@ -23,7 +23,7 @@ export default class ArtificialIntelligenceSystem extends System {
 
             if (ai.sleepTick > 0) {
                 updateAction(
-                    FRAME_DT,
+                    FRAME_DT_S,
                     ai,
                     mobility,
                     state,

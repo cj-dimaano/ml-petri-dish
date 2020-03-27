@@ -14,7 +14,7 @@ import ArtificialIntelligenceSystem from "./systems/artificial-intelligence.syst
 import ArtificialIntelligenceComponent from "./components/artificial-intelligence.component";
 
 const BUBBLE_POPULATION = 30;
-export const FRAME_DT = 1000 / 60;
+export const FRAME_DT_S = 1.0 / 60.0;
 
 export default class Game {
     constructor(private ctx: CanvasRenderingContext2D) {
@@ -47,15 +47,16 @@ export default class Game {
     get renderingContext() { return this.ctx; }
 
     run() {
+        const FRAME_DT_MS = FRAME_DT_S * 1000.0;
         let prevTick = performance.now();
         const start = prevTick;
         const nextFrame = (now: DOMHighResTimeStamp) => {
             // Update duration
             // durationElement.textContent = numeral((now - start) / 1000.0).format("00:00:00");
 
-            while (now - prevTick >= FRAME_DT) {
+            while (now - prevTick >= FRAME_DT_MS) {
                 this.update();
-                prevTick += FRAME_DT;
+                prevTick += FRAME_DT_MS;
             }
             this.draw();
 
