@@ -40,6 +40,7 @@ export default class ArtificialIntelligenceSystem extends System {
                 ai.memCount = 0;
                 ai.mem.push([state, 0, 0, []]);
                 ai.sleepTick += ai.sleepTime;
+                ai.wakeCount += 1;
             }
         });
     }

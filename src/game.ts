@@ -59,9 +59,7 @@ export default class Game {
                 prevTick += FRAME_DT_MS;
             }
             ui.updateBubbleCount(this.agentAi.score);
-            // @todo
-            //   update wake count
-            ui.updateWakeCount(0);
+            ui.updateWakeCount(this.agentAi.wakeCount);
             ui.updateRuntime(now);
             ui.updateAction(
                 this.agentMobility.angularAcceleration < 0,
