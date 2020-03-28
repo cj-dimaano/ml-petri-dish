@@ -23,7 +23,7 @@ export default class CollisionSystem extends System {
                 const b = entities[j];
                 const u = b.get(MobilityComponent).position;
                 const bCollision = b.get(CollisionComponent);
-                const w = LA.subtract(u, v);
+                const w = LA.difference(u, v);
                 const r = Math.max(
                     aCollision.radius,
                     b.get(CollisionComponent).radius

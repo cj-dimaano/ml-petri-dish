@@ -21,7 +21,7 @@ export default class ArtificialNeuralNetwork {
     hiddenLayers.push(outputCount);
     let a = inputCount;
     const w: number[][][] = Array(hiddenLayers.length);
-    for (let l = 0; l < hiddenLayers.length; l++) {
+    for (let l = 0; l < hiddenLayers.length; ++l) {
       const b = hiddenLayers[l];
       w[l] = this.makeNeuralNetLayer(a, b);
       a = b;
@@ -40,10 +40,10 @@ export default class ArtificialNeuralNetwork {
    * @remarks The feature inputs should exclude the bias.
    */
   generateOutputs(x: number[]): number[] {
-    let outputs = this.computeNodes(x).pop();
-    console.assert(outputs !== undefined);
-    outputs!.shift();
-    return outputs!;
+    let outputs = this.computeNodes(x).pop()!;
+    console.assert(!!outputs);
+    outputs.shift();
+    return outputs;
   }
 
   /**
@@ -54,31 +54,31 @@ export default class ArtificialNeuralNetwork {
    */
   updateWeights(x: number[], t: number[]) {
     const net = this.computeNodes(x);
-    const weights = this.weights;
-    const weightsCopy = this.copyWeights();
+    const weightsNew = this.weights;
+    const weightsOld = this.copyWeights();
     const gradient: number[][] = Array(net.length);
     // shift 1 to account for the computNodes output layer
     t.unshift(1);
 
-    console.assert(net.length === weightsCopy.length + 1);
+    console.assert(net.length === weightsOld.length + 1);
 
     /* https://en.wikipedia.org/wiki/Backpropagation#Derivation_for_a_single-layered_network */
-    for (let l = weightsCopy.length; l > 0; l--) {
+    for (let l = weightsOld.length; l > 0; --l) {
       const layer = net[l];
       gradient[l] = Array(layer.length);
-      for (let j = 0; j < layer.length; j++) {
+      for (let j = 0; j < layer.length; ++j) {
         const activationDerivitive = logisticDerivitive(layer[j]);
-        if (l === weightsCopy.length) {
+        if (l === weightsOld.length) {
           gradient[l][j] = (layer[j] - t[j]) * activationDerivitive;
         } else {
           const next = gradient[l + 1];
           let sum = 0;
           // start at 1 to account for the bias
-          for (let o = 1; o < next.length; o++) {
+          for (let o = 1; o < next.length; ++o) {
             // calculate the sum for intermediate node gradient
-            sum += weightsCopy[l][o - 1][j] * next[o];
+            sum += weightsOld[l][o - 1][j] * next[o];
             // update live weight
-            weights[l][o - 1][j] -= this.learningRate * layer[j] * next[o];
+            weightsNew[l][o - 1][j] -= this.learningRate * layer[j] * next[o];
           }
           gradient[l][j] = sum * activationDerivitive;
         }
@@ -90,9 +90,9 @@ export default class ArtificialNeuralNetwork {
 
   private copyWeights(): number[][][] {
     const copy: number[][][] = Array(this.weights.length);
-    for (let l = 0; l < copy.length; l++) {
+    for (let l = 0; l < copy.length; ++l) {
       const layer = Array(this.weights[l].length);
-      for (let w = 0; w < layer.length; w++) {
+      for (let w = 0; w < layer.length; ++w) {
         layer[w] = [...this.weights[l][w]];
       }
       copy[l] = layer;
@@ -103,12 +103,12 @@ export default class ArtificialNeuralNetwork {
   private computeNodes(x: number[]): number[][] {
     const nodes: number[][] = Array(this.weights.length + 1);
     nodes[0] = [1, ...x];
-    for (let l = 0; l < this.weights.length; l++) {
+    for (let l = 0; l < this.weights.length; ++l) {
       const layer = this.weights[l];
       const v = nodes[l];
       const u = Array(layer.length + 1);
       u[0] = 1;
-      for (let w = 0; w < layer.length; w++)
+      for (let w = 0; w < layer.length; ++w)
         u[w + 1] = this.activate(v, layer[w]);
       nodes[l + 1] = u;
     }
@@ -128,9 +128,9 @@ export default class ArtificialNeuralNetwork {
     outputCount: number): number[][] {
     const layer = Array<number[]>(outputCount);
     inputCount += 1; // +1 to account for the bias
-    for (let j = 0; j < outputCount; j++) {
+    for (let j = 0; j < outputCount; ++j) {
       const v = Array<number>(inputCount);
-      for (let i = 0; i < inputCount; i++) {
+      for (let i = 0; i < inputCount; ++i) {
         let w = 0;
         while (w === 0)
           w = Math.random() * 2 - 1;

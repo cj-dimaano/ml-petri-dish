@@ -39,6 +39,11 @@ export default class ArtificialIntelligenceComponent extends Component {
     score: number = 0;
 
     /**
+     * @brief The number of times the agent has been active
+     */
+    wakeCount: number = 0;
+
+    /**
      * @brief Time between each sample.
      */
     sampleTime: number = 1.0 / 5.0;

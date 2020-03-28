@@ -23,7 +23,7 @@ export default class TargetSystem extends System {
                     return;
 
                 const u = target.get(MobilityComponent).position;
-                const w = LA.subtract(u, v);
+                const w = LA.difference(u, v);
                 const dist = LA.dot(w, w);
                 if (dist < r * r)
                     targetComponent.targets.push([target, dist]);

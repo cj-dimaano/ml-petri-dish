@@ -12,56 +12,34 @@
 </head>
 
 <body>
-  <div id="duration"></div>
-  <div>
-    <canvas id="canvas" height="300" width="400"></canvas>
-  </div>
-  <div>
-    <table>
-      <tr><th colspan="9">state</th></tr>
-      <tr id="state">
-      </tr>
-    </table>
-  </div>
-  <div>
-    <table>
-      <tr>
-        <th></th>
-        <th>turn left</th>
-        <th>no turn</th>
-        <th>turn right</th>
-      </tr>
-      <tr>
-        <th>acceleration on</th>
-        <td id="choice4">
-          <div class="qa"></div>
-          <div class="qb"></div>
-        </td>
-        <td id="choice3">
-          <div class="qa"></div>
-          <div class="qb"></div>
-        </td>
-        <td id="choice5">
-          <div class="qa"></div>
-          <div class="qb"></div>
-        </td>
-      </tr>
-      <tr>
-        <th>acceleration off</th>
-        <td id="choice1">
-          <div class="qa"></div>
-          <div class="qb"></div>
-        </td>
-        <td id="choice0">
-          <div class="qa"></div>
-          <div class="qb"></div>
-        </td>
-        <td id="choice2">
-          <div class="qa"></div>
-          <div class="qb"></div>
-        </td>
-      </tr>
-    </table>
+  <div class="page">
+    <main>
+      <section class="game_info">
+        <div class="game_info__header game_info__col1">Wake Count</div>
+        <div class="game_info__header game_info__col2">Runtime</div>
+        <div class="game_info__header game_info__col3">Bubble Count</div>
+
+        <div id="wake_count" class="game_info__col1">0</div>
+        <div id="duration" class="game_info__col2">0:00:00</div>
+        <div id="bubble_count" class="game_info__col3">0</div>
+      </section>
+      <section>
+        <canvas id="canvas" height="300" width="400"></canvas>
+      </section>
+      <section class="agent_action">
+        <div>
+          <img id="action__rotate_ccw" class="action action__inactive" src="baseline_undo_black_18dp.png" title="rotate counter-clockwise">
+        </div>
+        <div>
+          <img id="action__accelerate" class="action action__inactive" src="baseline_arrow_upward_black_18dp.png" title="accelerate">
+        </div>
+        <div>
+          <img id="action__rotate_cw" class="action action__inactive" src="baseline_redo_black_18dp.png" title="rotate clockwise">
+        </div>
+      </section>
+      <section id="agent_environment">
+      </section>
+    </main>
   </div>
 </body>
 
