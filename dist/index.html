@@ -23,21 +23,32 @@
         <div id="duration" class="game_info__col2">0:00:00</div>
         <div id="bubble_count" class="game_info__col3">0</div>
       </section>
-      <section>
+      <section class="game_view">
         <canvas id="canvas" height="300" width="400"></canvas>
       </section>
       <section class="agent_action">
         <div>
-          <img id="action__rotate_ccw" class="action action__inactive" src="baseline_undo_black_18dp.png" title="rotate counter-clockwise">
+          <img id="action__rotate_ccw" class="action action__inactive" src="baseline_undo_black_18dp.png"
+            title="rotate counter-clockwise">
         </div>
         <div>
-          <img id="action__accelerate" class="action action__inactive" src="baseline_arrow_upward_black_18dp.png" title="accelerate">
+          <img id="action__accelerate" class="action action__inactive" src="baseline_arrow_upward_black_18dp.png"
+            title="accelerate">
         </div>
         <div>
-          <img id="action__rotate_cw" class="action action__inactive" src="baseline_redo_black_18dp.png" title="rotate clockwise">
+          <img id="action__rotate_cw" class="action action__inactive" src="baseline_redo_black_18dp.png"
+            title="rotate clockwise">
         </div>
       </section>
-      <section id="agent_environment">
+      <section class="environment_state">
+        <table>
+          <thead>
+            <tr>
+              <th colspan="2">Environment State</th>
+            </tr>
+          </thead>
+          <tbody id="agent_environment"></tbody>
+        </table>
       </section>
     </main>
   </div>

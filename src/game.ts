@@ -13,6 +13,7 @@ import TargetSystem from "./systems/target.system";
 import ArtificialIntelligenceSystem from "./systems/artificial-intelligence.system";
 import ArtificialIntelligenceComponent from "./components/artificial-intelligence.component";
 import UI from "./ui";
+import { getEnvironmentStateFromEntity } from "./environment-state";
 
 const BUBBLE_POPULATION = 30;
 export const FRAME_DT_S = 1.0 / 60.0;
@@ -66,6 +67,7 @@ export default class Game {
                 this.agentMobility.acceleration > 0,
                 this.agentMobility.angularAcceleration > 0
             );
+            ui.updateState(getEnvironmentStateFromEntity(this.agentEntity));
             this.draw();
 
             requestAnimationFrame(nextFrame);
