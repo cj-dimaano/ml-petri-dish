@@ -12,12 +12,13 @@ import TargetComponent from "../components/target.component";
 import * as LA from "../linear-algebra";
 import CollisionComponent from "../components/collision.component";
 import { FRAME_DT_S } from "../game";
+import { getEnvironmentStateFromEntity, getVectorFromEnvironmentState } from "../environment-state";
 
 export default class ArtificialIntelligenceSystem extends System {
     constructor() { super(); }
     update() {
         this.entities.forEach(entity => {
-            const state = this.getEnvironmentState(entity);
+            const state = getVectorFromEnvironmentState(getEnvironmentStateFromEntity(entity));
             const ai = entity.get(ArtificialIntelligenceComponent);
             const mobility = entity.get(MobilityComponent);
 
@@ -43,18 +44,6 @@ export default class ArtificialIntelligenceSystem extends System {
                 ai.wakeCount += 1;
             }
         });
-    }
-    getEnvironmentState(entity: Entity): number[] {
-        const mobility = entity.get(MobilityComponent);
-        const targets = entity.get(TargetComponent).targets;
-        const v = mobility.position;
-        const u = targets.length > 0
-            ? targets[0][0].get(MobilityComponent).position
-            : v;
-        return [
-            ...LA.rotate(mobility.velocity, -mobility.angle),
-            ...LA.rotate(LA.difference(u, v), -mobility.angle)
-        ];
     }
     protected onEntityAdded(entity: Entity) {
         entity.add(ArtificialIntelligenceComponent);

@@ -3,6 +3,7 @@
 @author CJ Dimaano <c.j.s.dimaano@gmail.com>
 *******************************************************************************/
 import * as numeral from "numeral";
+import { getStateKeyOrder } from "./environment-state";
 
 export default class UI {
 	constructor(private startTimeStamp: DOMHighResTimeStamp) {
@@ -13,6 +14,8 @@ export default class UI {
 		this.actionRotateCCWDOM = document.querySelector("#action__rotate_ccw")!;
 		this.actionAccelerateDOM = document.querySelector("#action__accelerate")!;
 		this.actionRotateCWDOM = document.querySelector("#action__rotate_cw")!;
+
+		this.environmentStateDOM = document.querySelector("#agent_environment")!;
 	}
 
 	private wakeCountDOM: Element;
@@ -23,7 +26,9 @@ export default class UI {
 	private actionAccelerateDOM: Element;
 	private actionRotateCWDOM: Element;
 
-	// @todo: state DOM
+	private environmentStateDOM: Element;
+	private statePropertyDOMMap: Map<symbol | string, Element> =
+		new Map<symbol | string, Element>();
 
 	updateWakeCount(value: number) {
 		this.wakeCountDOM.textContent = `${value}`;
@@ -41,5 +46,38 @@ export default class UI {
 		this.actionRotateCCWDOM.classList.toggle("action__inactive", !isRotatingCCW);
 		this.actionAccelerateDOM.classList.toggle("action__inactive", !isAccelerating);
 		this.actionRotateCWDOM.classList.toggle("action__inactive", !isRotatingCW);
+	}
+
+	updateState(state: any) {
+		if ((() => {
+			for (const key in state) {
+				if (!this.statePropertyDOMMap.has(key))
+					return true;
+			}
+			for (const key of this.statePropertyDOMMap.keys()) {
+				if (!(key in state))
+					return true;
+			}
+			return false;
+		})()) {
+			this.statePropertyDOMMap.clear();
+			this.environmentStateDOM.textContent = "";
+			for (const key of getStateKeyOrder()) {
+				const tr = document.createElement("tr");
+				const tdKey = document.createElement("td");
+				const tdVal = document.createElement("td");
+				tdKey.className = "state__key";
+				tdKey.textContent = key;
+				tdVal.className = "state__value";
+				tr.append(tdKey, tdVal);
+				this.environmentStateDOM.append(tr);
+				this.statePropertyDOMMap.set(key, tdVal);
+			}
+		}
+		for (const key in state) {
+			const val = Math.abs(state[key]) < 0.001 ? 0 : state[key];
+			this.statePropertyDOMMap.get(key)!.textContent =
+				`${numeral(val).format("0.00")}`;
+		}
 	}
 }
