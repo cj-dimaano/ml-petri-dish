@@ -8,7 +8,6 @@ import Entity from "../entities/entity";
 import ArtificialIntelligenceComponent
     from "../components/artificial-intelligence.component";
 import MobilityComponent from "../components/mobility.component";
-import TargetComponent from "../components/target.component";
 import * as LA from "../linear-algebra";
 import CollisionComponent from "../components/collision.component";
 import { FRAME_DT_S } from "../game";
