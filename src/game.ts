@@ -14,13 +14,17 @@ import ArtificialIntelligenceSystem from "./systems/artificial-intelligence.syst
 import ArtificialIntelligenceComponent from "./components/artificial-intelligence.component";
 import UI from "./ui";
 import { getEnvironmentStateFromEntity } from "./environment-state";
+import * as LA from "./linear-algebra";
 
 const BUBBLE_POPULATION = 30;
 export const FRAME_DT_S = 1.0 / 60.0;
 
 export default class Game {
-    constructor(private ctx: CanvasRenderingContext2D) {
-        this.mobilitySystem = new MobilitySystem(ctx.canvas);
+    constructor(
+        private environmentCtx: CanvasRenderingContext2D,
+        private agentCtx: CanvasRenderingContext2D
+    ) {
+        this.mobilitySystem = new MobilitySystem(environmentCtx.canvas);
         this.collisionSystem = new CollisionSystem();
         this.consumerSystem = new ConsumerSystem(this.mobilitySystem);
         this.targetSystem = new TargetSystem(this.mobilitySystem);
@@ -48,7 +52,7 @@ export default class Game {
     agentAi: ArtificialIntelligenceComponent;
     agentMobility: MobilityComponent;
 
-    get renderingContext() { return this.ctx; }
+    get renderingContext() { return this.environmentCtx; }
 
     run() {
         const FRAME_DT_MS = FRAME_DT_S * 1000.0;
@@ -88,9 +92,35 @@ export default class Game {
     }
 
     private draw() {
-        this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
-        this.bubbleEntities.forEach(bubble => bubble.draw(this.ctx));
-        this.agentEntity.draw(this.ctx);
+        ((g, b, a) => {
+            g.clearRect(0, 0, g.canvas.width, g.canvas.height);
+            b.forEach(bubble => bubble.draw(g));
+            a.draw(g);
+        })(this.environmentCtx, this.bubbleEntities, this.agentEntity);
+
+        ((g, s) => {
+            const [w, h] = [g.canvas.width, g.canvas.height];
+            g.clearRect(0, 0, w, h);
+
+            const w2 = w / 2;
+            const u = LA.normalize([s.x, s.y]);
+            const bw = Math.abs((1 - LA.magnitude([s.x, s.y]) / 100) * w2); // 100 === vision radius
+            const bx = w * Math.atan2(u[0], -u[1]) / LA.TAU;
+            g.strokeStyle = "blue";
+            g.fillStyle = "blue";
+            g.fillRect(bx, 0, bw, h);
+            g.strokeRect(bx, 0, bw, h);
+            g.fillRect(bx - w, 0, bw, h);
+            g.strokeRect(bx - w, 0, bw, h);
+            g.fillRect(bx + w, 0, bw, h);
+            g.strokeRect(bx + w, 0, bw, h);
+
+            g.strokeStyle = "rgba(0,0,0,0.2)";
+            g.beginPath();
+            g.moveTo(w / 2, h);
+            g.lineTo(w / 2, 0);
+            g.stroke();
+        })(this.agentCtx, getEnvironmentStateFromEntity(this.agentEntity));
     }
 
     private mobilitySystem: MobilitySystem;
