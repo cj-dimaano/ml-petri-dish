@@ -6,6 +6,12 @@
 import Component from "./component";
 import ArtificialNeuralNetwork from "../artificial-neural-network";
 
+export type MasterDecider = {
+    Pa: ArtificialNeuralNetwork,
+    Pb: ArtificialNeuralNetwork,
+    mem: [number[], number, number, number[]][]
+}
+
 export default class ArtificialIntelligenceComponent extends Component {
     constructor() { super(ArtificialIntelligenceComponent); }
 
@@ -13,19 +19,20 @@ export default class ArtificialIntelligenceComponent extends Component {
      * @remarks
      *   4 inputs include velocity vector with respect to the agent and the
      *   position of a single target with respect to the agent.
-     * 
-     *   6 outputs include confidence values for the total number of possible
-     *   action combinations (2 possible linear actions, and 3 possible angular
-     *   actions).
      */
-    Pa: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(4, 6, [16, 16, 16, 16]);
-    Pb: ArtificialNeuralNetwork = new ArtificialNeuralNetwork(4, 6, [16, 16, 16, 16]);
 
-    /**
-     * @remarks
-     *   These values are used to update weights.
-     */
-    mem: [number[], number, number, number[]][] = [];
+    turnMaster: MasterDecider = {
+        Pa: new ArtificialNeuralNetwork(4, 3, [16, 16, 16, 16]),
+        Pb: new ArtificialNeuralNetwork(4, 3, [16, 16, 16, 16]),
+        mem: []
+    };
+
+    accelerateMaster: MasterDecider = {
+        Pa: new ArtificialNeuralNetwork(4, 2, [16, 16, 16, 16]),
+        Pb: new ArtificialNeuralNetwork(4, 2, [16, 16, 16, 16]),
+        mem: []
+    };
+
     memCount: number = 0;
 
     /**

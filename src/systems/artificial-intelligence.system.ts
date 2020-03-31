@@ -5,7 +5,7 @@
 
 import System from "./system";
 import Entity from "../entities/entity";
-import ArtificialIntelligenceComponent
+import ArtificialIntelligenceComponent, { MasterDecider }
     from "../components/artificial-intelligence.component";
 import MobilityComponent from "../components/mobility.component";
 import * as LA from "../linear-algebra";
@@ -29,16 +29,19 @@ export default class ArtificialIntelligenceSystem extends System {
                     state,
                     entity.get(CollisionComponent).collisions.size
                 );
-            } else if (ai.memCount < ai.mem.length) {
+            } else if (ai.memCount < ai.accelerateMaster.mem.length) {
                 mobility.acceleration = 0;
                 mobility.angularAcceleration = 0;
                 ai.memCount++;
-                const mem = ai.mem[Math.floor(Math.random() * ai.mem.length)];
-                updateWeights(ai, ...mem);
+                const index = Math.floor(Math.random() * ai.accelerateMaster.mem.length);
+                const [accelerateMaster, turnMaster] = [ai.accelerateMaster, ai.turnMaster];
+                updateWeights(accelerateMaster, ai.discountFactor, ...accelerateMaster.mem[index]);
+                updateWeights(turnMaster, ai.discountFactor, ...turnMaster.mem[index]);
             } else {
                 // ai.mem.length = 0;
                 ai.memCount = 0;
-                ai.mem.push([state, 0, 0, []]);
+                ai.accelerateMaster.mem.push([state, 0, 0, []]);
+                ai.turnMaster.mem.push([state, 0, 0, []]);
                 ai.sleepTick += ai.sleepTime;
                 ai.wakeCount += 1;
             }
@@ -70,13 +73,31 @@ function updateAction(
 ) {
     ai.sleepTick -= dt;
 
-    const lastMem = ai.mem[ai.mem.length - 1];
-    lastMem[3] = state;
-    lastMem[2] -= dt;
+    const [turnMaster, accelerateMaster] = [ai.turnMaster, ai.accelerateMaster];
+
+    const [
+        lastTurnMem,
+        lastAccelerateMem
+    ] = [
+            turnMaster.mem[turnMaster.mem.length - 1],
+            accelerateMaster.mem[accelerateMaster.mem.length - 1]
+        ];
+    [
+        lastTurnMem[3],
+        lastAccelerateMem[3]
+    ] = [state, state];
+
+    // update reward
+    [
+        lastTurnMem[2],
+        lastAccelerateMem[2]
+    ] = [
+            getTurnReward(state),
+            getAccelerateReward(state)
+        ];
 
     // update score
     if (collisionCount > 0) {
-        lastMem[2] = collisionCount;
         ai.score += collisionCount;
         ai.sleepTick += collisionCount;
     }
@@ -87,46 +108,59 @@ function updateAction(
         return;
     ai.sampleTick -= ai.sampleTime;
 
-    // get Q predictions
+    // get decisions
+    mobility.acceleration = getAcceleration(accelerateMaster, state, ai.score);
+    mobility.angularAcceleration = getAngularAcceleration(turnMaster, state, ai.score);
+}
+
+function getTurnReward(state: number[]): number {
+    const [x, y] = [state[2], state[3]];
+    /*
+    The turn reward is calculated as the facing direction of the agent with respect to the target in
+    radians, scaled between -1 to 1, squared, and then subtracted from 1.
+    */
+    const d = 2 * Math.atan2(x, y) / LA.TAU - 1;
+    return 1 - d * d;
+}
+
+function getAccelerateReward(state: number[]): number {
+    const [x, y] = [state[2], state[3]];
+    // The closer the target, the higher the reward
+    return Math.abs(1 - LA.magnitude([x, y]) / 100); // 100 === vision radius
+}
+
+function getAcceleration(
+    ai: MasterDecider,
+    state: number[],
+    score: number
+): number {
     const Qa = ai.Pa.generateOutputs(state);
     const Qb = ai.Pb.generateOutputs(state);
-
-    // apply output choice
-    const choice = makeChoice(Qa, Qb, ai.score);
-    console.assert(choice > -1 && choice < 6);
-    mobility.acceleration = 0;
-    mobility.angularAcceleration = 0;
-    switch (choice) {
-        case 1:
-            mobility.acceleration = 0;
-            mobility.angularAcceleration = 10;
-            break;
-
-        case 2:
-            mobility.acceleration = 0;
-            mobility.angularAcceleration = -10;
-            break;
-
-        case 3:
-            mobility.acceleration = 2;
-            mobility.angularAcceleration = 0;
-            break;
-
-        case 4:
-            mobility.acceleration = 2;
-            mobility.angularAcceleration = 10;
-            break;
-
-        case 5:
-            mobility.acceleration = 2;
-            mobility.angularAcceleration = -10;
-            break;
-    }
-
+    const choice = makeChoice(Qa, Qb, score);
     // save current memory
     if (ai.mem.length === 256)
         ai.mem.shift();
     ai.mem.push([state, choice, 0, []]);
+    return choice * 2;
+}
+
+function getAngularAcceleration(
+    ai: MasterDecider,
+    state: number[],
+    score: number
+): number {
+    const Qa = ai.Pa.generateOutputs(state);
+    const Qb = ai.Pb.generateOutputs(state);
+    const choice = makeChoice(Qa, Qb, score);
+    // save current memory
+    if (ai.mem.length === 256)
+        ai.mem.shift();
+    ai.mem.push([state, choice, 0, []]);
+    if (choice === 1)
+        return -10;
+    else if (choice === 2)
+        return 10;
+    return 0;
 }
 
 function argMax(options: number[]): number {
@@ -154,13 +188,14 @@ function normalize(v: number[]): number[] {
 }
 
 function updateWeights(
-    ai: ArtificialIntelligenceComponent,
+    ai: MasterDecider,
+    discountFactor: number,
     state: number[],
     choice: number,
     reward: number,
     nextState: number[]
 ) {
-    state.forEach(v => console.assert(!Number.isNaN(v)));
+    console.assert(!state.find(Number.isNaN));
     const Qa = ai.Pa.generateOutputs(state);
     const Qb = ai.Pb.generateOutputs(state);
     const QaNext = nextState.length > 0
@@ -178,7 +213,7 @@ function updateWeights(
         + ai.Pa.learningRate
         * (
             reward
-            + ai.discountFactor
+            + discountFactor
             * QbNext[argMax(QaNext)]
             - mChoiceA
         );
@@ -187,7 +222,7 @@ function updateWeights(
         + ai.Pb.learningRate
         * (
             reward
-            + ai.discountFactor
+            + discountFactor
             * QaNext[argMax(QbNext)]
             - mChoiceB
         );
